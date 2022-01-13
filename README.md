@@ -1,2 +1,2 @@
 # cheat_sheets
-Assorted cheat sheets
+これは自分用に作ったチートシートの詰め合わせです。
