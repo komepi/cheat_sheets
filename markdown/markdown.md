@@ -4,8 +4,10 @@
   - [Format Text - テキストの装飾](#format-text---テキストの装飾)
     - [Header - 見出し](#header---見出し)
     - [Emphasis - 強調](#emphasis---強調)
+    - [位置の調整](#位置の調整)
     - [Strikethrough - 打消し線](#strikethrough---打消し線)
     - [Details - 折りたたみ](#details---折りたたみ)
+  - [空行](#空行)
   - [Lists - リスト](#lists---リスト)
     - [Disc型](#disc型)
     - [Decimal型](#decimal型)
@@ -16,6 +18,11 @@
   - [Links - リンク](#links---リンク)
   - [Images - 画像埋め込み](#images---画像埋め込み)
   - [テーブル記法](#テーブル記法)
+    - [テーブル内の改行](#テーブル内の改行)
+    - [テーブルのセル結合](#テーブルのセル結合)
+      - [横方向](#横方向)
+      - [縦方向](#縦方向)
+      - [組み合わせ](#組み合わせ)
   - [数式](#数式)
   - [コード](#コード)
   - [改ページ](#改ページ)
@@ -39,6 +46,24 @@
 _か*で囲むとHTMLのemタグになる。_こんな感じ_
 \_\_か\*\*で囲むとHTMLのstrongタグになる。要するにbold。**こんな感じ**
 
+### 位置の調整
+Markdownには位置の調整（中央寄せ、右寄せ、左寄せ）する記法はない。そのため、自分でHTMLを記述する。
+```html
+<div style="text-align: center">
+中央寄せする文章
+</div>
+```
+><div style="text-align: center">
+>中央寄せする文章
+></div>
+
+text-alignのプロパティは以下がある。
+|値|表示|
+|:-:|:-:|
+|center|中央寄せ|
+|right|右寄せ|
+|left|左寄せ|
+
 ### Strikethrough - 打消し線
 
 打消し戦を使うには\~\~で囲む。~~こんな感じ~~
@@ -55,6 +80,19 @@ _か*で囲むとHTMLのemタグになる。_こんな感じ_
 ここに開いたときに表示される文章.
 みたいな
 </details>
+
+## 空行
+htmlの<br />を使う
+```html
+1行目
+<br />
+<br />
+4行目
+```
+1行目
+<br />
+<br />
+2行目
 
 ## Lists - リスト
 
@@ -239,6 +277,86 @@ Markdown:
 | left       | right       | center       |
 | aligned    | aligned     | aligned      |
 二段目の「:」の位置で左寄せ右寄せ中央が決まる。
+
+### テーブル内の改行
+テーブルの一つのセル内で改行を行うには`<br>`タグを入れればいい
+```markdown
+|name|
+|:---|
+|foobar <br> baz|
+```
+|name|
+|:---|
+|foobar <br> baz|
+
+### テーブルのセル結合
+
+markdownのテーブルでもセル結合を行うことができる。
+vscodeの「Markdown Preview Enhanced」を使う場合、設定の変更が必要。「Markdown-preview-enhanced: Enable Extended Table Syntax」にチェックを付ける（デフォルトだと向こうになっている)
+
+#### 横方向
+
+横方向に結合するには、何も設定しないか`>`を設定する。文字の位置を指定する場合には、表示する文字のセル位置に注意が必要。
+
+```markdown
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |fuga   |piyo   |
+|hoge   |       |piyo   |
+|>      |fuga   |piyo   |
+|hoge   |fuga   |       |
+|hoge   |>      |piyo   |
+|hoge   |       |       |
+|>      |fuga   |       |
+|>      |>      |piyo   |
+```
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |fuga   |piyo   |
+|hoge   |       |piyo   |
+|>      |fuga   |piyo   |
+|hoge   |fuga   |       |
+|hoge   |>      |piyo   |
+|hoge   |       |       |
+|>      |fuga   |       |
+|>      |>      |piyo   |
+
+#### 縦方向
+
+縦方向に結合する場合は`^`を設定する。
+```markdown
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |fuga   |piyo   |
+|hoge   |^      |^      |
+|hoge   |fuga   |^      |
+```
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |fuga   |piyo   |
+|hoge   |^      |^      |
+|hoge   |fuga   |^      |
+
+#### 組み合わせ
+
+縦と横を組み合わせることもできる。
+
+```markdown
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |>      |piyo   |
+|hoge   |^      |^      |
+|hoge   |^      |^      |
+|hoge   |       |piyo   |
+|^      |^      |piyo   |
+```
+|header1|header2|header3|
+|:------|:-----:|------:|
+|hoge   |>      |piyo   |
+|hoge   |^      |^      |
+|hoge   |^      |^      |
+|hoge   |       |piyo   |
+|^      |^      |piyo   |
 
 ## 数式
 
