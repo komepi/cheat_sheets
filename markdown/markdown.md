@@ -19,6 +19,7 @@
   - [数式](#数式)
   - [コード](#コード)
   - [その他](#その他)
+  - [参考資料](#参考資料)
 
 ## Format Text - テキストの装飾
 
@@ -239,3 +240,7 @@ puts 'The best way to log and share programmers knowledge.'
 
 ## その他
 プレビューで`<p data-line="232" class="sync-line" style="margin:0;"></p>`と表示されることがあるけど、バグ。PDFに変換するとなくなる。
+
+## 参考資料
+* [Markdown記法 チートシート - Qiita](https://qiita.com/Qiita/items/c686397e4a0f4f11683d)
+* [Daring Fireball: Markdown Syntax Documentation](https://daringfireball.net/projects/markdown/syntax)
