@@ -21,27 +21,34 @@
   - [その他](#その他)
   - [参考資料](#参考資料)
 
+<div style="page-break-before:always"></div>
+
 ## Format Text - テキストの装飾
 
 ### Header - 見出し
 
-* \# : H1タグ
-* \## : H2 タグ
-* \##### : H5タグ
+- \# : H1タグ
+- \## : H2 タグ
+- \##### : H5タグ
 
 \#の数でインデントや文字の大きさが決まる。
 
 ### Emphasis - 強調
+
 _か*で囲むとHTMLのemタグになる。_こんな感じ_
 \_\_か\*\*で囲むとHTMLのstrongタグになる。要するにbold。**こんな感じ**
 
 ### Strikethrough - 打消し線
+
 打消し戦を使うには\~\~で囲む。~~こんな感じ~~
 
 ### Details - 折りたたみ
+
 追加情報としたい内容をdetailsタグで囲む。そして、要約として表示したい文章をsummaryタグで記載する。
 折りたたんだ部分でMarkdownを使いたい場合は、折りたたまれる部分全体をdivタブで囲む。
-<details><summary>
+
+<details>
+<summary>
 ここにたたむ前から表示される文章
 </summary>
 ここに開いたときに表示される文章.
@@ -49,12 +56,14 @@ _か*で囲むとHTMLのemタグになる。_こんな感じ_
 </details>
 
 ## Lists - リスト
+
 箇条書きをする
+
 ### Disc型
 
-* 文頭に「\*」「\+」「\-」のどれかを入れるとDisc型になる
-* 記号の次に空白を忘れないように
-* リストを挿入するときは、リストの上下に空行がないと正しく表示されないかもしれない
+- 文頭に「\*」「\+」「\-」のどれかを入れるとDisc型になる
+- 記号の次に空白を忘れないように
+- リストを挿入するときは、リストの上下に空行がないと正しく表示されないかもしれない
 
 ### Decimal型
 
@@ -63,8 +72,10 @@ _か*で囲むとHTMLのemタグになる。_こんな感じ_
 1. 「数字.」の次の空白を忘れずに
 
 ### Definition型
+
 HTMLのdlタグをそのまま使う。
-```
+
+```html
 <dl>
     <dt>リンゴ</dt>
     <dd>赤いフルーツ</dd>
@@ -72,6 +83,7 @@ HTMLのdlタグをそのまま使う。
     <dd>橙色のフルーツ</dd>
 <dl>
 ```
+
 みたいにすると
 <dl>
     <dt>リンゴ</dt>
@@ -82,12 +94,14 @@ HTMLのdlタグをそのまま使う。
 こうなる。
 
 加えて、Definition型のリストではMarkdown記法が使えない。例えば
-```
+
+```html
 <dl>
     <dt>リンゴ</dt>
     <dd>とても**赤い**フルーツ</dd>
 </dl>
 ```
+
 とすると、
 
 <dl>
@@ -97,12 +111,14 @@ HTMLのdlタグをそのまま使う。
 こうなる。
 
 Definition型リスト内では代わりにHTMLタグを使わないといけないので
-```
+
+```html
 <dl>
   <dt>リンゴ</dt>
   <dd> とても<strong>赤い</strong>フルーツ </dd>
 </dl>
 ```
+
 <dl>
   <dt>リンゴ</dt>
   <dd> とても<strong>赤い</strong>フルーツ </dd>
@@ -113,7 +129,7 @@ Markdown記法とHTMLタグの対応は以下のようになっている。
 
 |修飾|Markdown|HTML|
 |:---:|:---:|:---:|
-|ボールド|** **|\<strong>\</strong>|
+|ボールド|****|\<strong>\</strong>|
 |イタリック|\_ \_|\<em>\</em>|
 |コード|\`\`|\<code>\</code>|
 |リンク|\[text]\(url)|\<a href="url">text\</a>|
@@ -121,6 +137,11 @@ Markdown記法とHTMLタグの対応は以下のようになっている。
 ### Checkbox型
 
 Disc型の記述の後ろに\[ ]を入れるとチェックボックスができる。チェックが入った状態のボックスを生成するときは\[x]にする。前後にスペースがいる
+
+- [ ] チェック1
+- [ ] チェック2
+
+なぜかできない
 
 ## Blockquotes - 引用
 
@@ -136,33 +157,38 @@ Disc型の記述の後ろに\[ ]を入れるとチェックボックスができ
 こんな感じに
 
 ## Horizontal rules - 水平線
+
 これらは全部水平線になる
 
-```
+```markdown
 * * *
 ***
 - - -
 -----
 ```
+
 こんな感じの線になる
 ***
 
 ## Links - リンク
-* リンク付きテキスト
+
+- リンク付きテキスト
 \[リンクテキスト](URL)
 これでクリックするとURLに飛ぶテキストが作れる
 例：
+
 >Markdown: \[Qiita](http://qiita.com)
 >結果: [Qiita](http://qiita.com)
 
-* タイトル付きのリンクを作れる
+- タイトル付きのリンクを作れる
 \[リンクテキスト](URL "タイトル")
 この時文面に出てくるのはリンクテキストで、タイトルはマウスホバーすると表示される。
 例：
+
 >Markdown: \[Quita](http://qiita.com "Qiita Home")
 >結果: [Quita](http://qiita.com "Qiita Home")
 
-* 同じURLのリンクを複数設置
+- 同じURLのリンクを複数設置
 \[リンクテキスト][名前]
 \[名前]:URL
 これで同じURLへのリンクを複数設置できる
@@ -178,16 +204,20 @@ Markdown:
 なぜかできないけど
 
 ## Images - 画像埋め込み
+
 2パターンある
-* タイトルなしの画像
+
+- タイトルなしの画像
 \!\[代替テキスト](画像のURL)
-* タイトルありの画像
+- タイトルありの画像
 \!\[代替テキスト](画像のURL "画像のタイトル")
+
 >Markdown: \!\[Qiita](https://qiita-image-store.s3.amazonaws.com/0/45617/015bd058-7ea0-e6a5-b9cb-36a4fb38e59c.png "Qiita")
 >結果: ![Qiita](https://qiita-image-store.s3.amazonaws.com/0/45617/015bd058-7ea0-e6a5-b9cb-36a4fb38e59c.png "Qiita")
 
 ## テーブル記法
-```
+
+```table
 | Left align | Right align | Center align |
 |:-----------|------------:|:------------:|
 | This       | This        | This         |
@@ -197,6 +227,7 @@ Markdown:
 | left       | right       | center       |
 | aligned    | aligned     | aligned      |
 ```
+
 これがこれになる
 | Left align | Right align | Center align |
 |:-----------|------------:|:------------:|
@@ -209,18 +240,22 @@ Markdown:
 二段目の「:」の位置で左寄せ右寄せ中央が決まる。
 
 ## 数式
+
 コードブロックに「math」を付けるとTex記法を使って数式をかける。
 >\```math
 >\left( \sum_{k=1}^n a_k b_k \right)^{!!2} \leq
 >\left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
 >\```
+
 ```math
 \left( \sum_{k=1}^n a_k b_k \right)^{!!2} \leq
 \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)
 ```
+
 \$2\^3\$みたいに文中に埋め込むこともできる。すると$2^3$となる。
 
 ## コード
+
 コードみたいに埋め込むこともできる。
 \`printf()\`みたいにラップすると`printf()`となる。
 ``これでも行ける``
@@ -239,8 +274,11 @@ puts 'The best way to log and share programmers knowledge.'
 こうなる。
 
 ## その他
+
 プレビューで`<p data-line="232" class="sync-line" style="margin:0;"></p>`と表示されることがあるけど、バグ。PDFに変換するとなくなる。
 
 ## 参考資料
-* [Markdown記法 チートシート - Qiita](https://qiita.com/Qiita/items/c686397e4a0f4f11683d)
-* [Daring Fireball: Markdown Syntax Documentation](https://daringfireball.net/projects/markdown/syntax)
+
+- [Markdown記法 チートシート - Qiita](https://qiita.com/Qiita/items/c686397e4a0f4f11683d)
+
+- [Daring Fireball: Markdown Syntax Documentation](https://daringfireball.net/projects/markdown/syntax)
