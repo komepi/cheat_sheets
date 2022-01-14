@@ -18,6 +18,7 @@
   - [テーブル記法](#テーブル記法)
   - [数式](#数式)
   - [コード](#コード)
+  - [改ページ](#改ページ)
   - [その他](#その他)
   - [参考資料](#参考資料)
 
@@ -273,6 +274,12 @@ puts 'The best way to log and share programmers knowledge.'
 
 こうなる。
 
+## 改ページ
+PDFに変換したときに改ページするには以下のcssを改ページしたいか所に挿入する。
+
+```css
+<div style="page-break-before:always"></div>
+```
 ## その他
 
 プレビューで`<p data-line="232" class="sync-line" style="margin:0;"></p>`と表示されることがあるけど、バグ。PDFに変換するとなくなる。
