@@ -254,6 +254,9 @@ Markdown:
 >Markdown: \!\[Qiita](https://qiita-image-store.s3.amazonaws.com/0/45617/015bd058-7ea0-e6a5-b9cb-36a4fb38e59c.png "Qiita")
 >結果: ![Qiita](https://qiita-image-store.s3.amazonaws.com/0/45617/015bd058-7ea0-e6a5-b9cb-36a4fb38e59c.png "Qiita")
 
+画像のリサイズをしたい場合は、htmlで記述しないといけない
+> \<img src="画像のURL" width=画像のサイズ>
+
 ## テーブル記法
 
 ```table
