@@ -71,7 +71,7 @@ text-alignのプロパティは以下がある。
 ### Details - 折りたたみ
 
 追加情報としたい内容をdetailsタグで囲む。そして、要約として表示したい文章をsummaryタグで記載する。
-折りたたんだ部分でMarkdownを使いたい場合は、折りたたまれる部分全体をdivタブで囲む。
+
 
 <details>
 <summary>
@@ -80,6 +80,16 @@ text-alignのプロパティは以下がある。
 ここに開いたときに表示される文章.
 みたいな
 </details>
+
+折りたたんだ部分でMarkdownを使いたい場合は、折りたたまれる部分全体をdivタブで囲む。
+
+<details><summary>すごく長い文章とかプログラムとか</summary><div>
+
+```python
+test
+```
+</div></details>
+必ず\<div>の後に空行を入れること
 
 ## 空行
 htmlの<br />を使う
