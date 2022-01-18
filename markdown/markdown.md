@@ -1,22 +1,22 @@
 # markdown cheat sheet
 
 - [markdown cheat sheet](#markdown-cheat-sheet)
-  - [Format Text - テキストの装飾](#format-text---テキストの装飾)
-    - [Header - 見出し](#header---見出し)
-    - [Emphasis - 強調](#emphasis---強調)
+  - [テキストの装飾](#テキストの装飾)
+    - [見出し](#見出し)
+    - [強調](#強調)
     - [位置の調整](#位置の調整)
-    - [Strikethrough - 打消し線](#strikethrough---打消し線)
-    - [Details - 折りたたみ](#details---折りたたみ)
+    - [打消し線](#打消し線)
+    - [折りたたみ](#折りたたみ)
   - [空行](#空行)
-  - [Lists - リスト](#lists---リスト)
+  - [リスト](#リスト)
     - [Disc型](#disc型)
     - [Decimal型](#decimal型)
     - [Definition型](#definition型)
     - [Checkbox型](#checkbox型)
-  - [Blockquotes - 引用](#blockquotes---引用)
-  - [Horizontal rules - 水平線](#horizontal-rules---水平線)
-  - [Links - リンク](#links---リンク)
-  - [Images - 画像埋め込み](#images---画像埋め込み)
+  - [引用](#引用)
+  - [水平線](#水平線)
+  - [リンク](#リンク)
+  - [画像埋め込み](#画像埋め込み)
   - [テーブル記法](#テーブル記法)
     - [テーブル内の改行](#テーブル内の改行)
     - [テーブルのセル結合](#テーブルのセル結合)
@@ -27,13 +27,15 @@
   - [コード](#コード)
   - [改ページ](#改ページ)
   - [その他](#その他)
+    - [markdown enhance preview のエラーについて](#markdown-enhance-preview-のエラーについて)
+    - [HTMLについて](#htmlについて)
   - [参考資料](#参考資料)
 
 <div style="page-break-before:always"></div>
 
-## Format Text - テキストの装飾
+## テキストの装飾
 
-### Header - 見出し
+### 見出し
 
 - \# : H1タグ
 - \## : H2 タグ
@@ -41,7 +43,7 @@
 
 \#の数でインデントや文字の大きさが決まる。
 
-### Emphasis - 強調
+### 強調
 
 _か*で囲むとHTMLのemタグになる。_こんな感じ_
 \_\_か\*\*で囲むとHTMLのstrongタグになる。要するにbold。**こんな感じ**
@@ -64,11 +66,11 @@ text-alignのプロパティは以下がある。
 |right|右寄せ|
 |left|左寄せ|
 
-### Strikethrough - 打消し線
+### 打消し線
 
 打消し戦を使うには\~\~で囲む。~~こんな感じ~~
 
-### Details - 折りたたみ
+### 折りたたみ
 
 追加情報としたい内容をdetailsタグで囲む。そして、要約として表示したい文章をsummaryタグで記載する。
 
@@ -104,7 +106,7 @@ htmlの<br />を使う
 <br />
 2行目
 
-## Lists - リスト
+## リスト
 
 箇条書きをする
 
@@ -134,12 +136,16 @@ HTMLのdlタグをそのまま使う。
 ```
 
 みたいにすると
+
+<div>
 <dl>
     <dt>リンゴ</dt>
     <dd>赤いフルーツ</dd>
     <dt>オレンジ</dt>
     <dd>橙色のフルーツ</dd>
 <dl>
+</div>
+
 こうなる。
 
 加えて、Definition型のリストではMarkdown記法が使えない。例えば
@@ -153,10 +159,13 @@ HTMLのdlタグをそのまま使う。
 
 とすると、
 
+<div>
 <dl>
     <dt>リンゴ</dt>
     <dd>とても**赤い**フルーツ</dd>
 </dl>
+</div>
+
 こうなる。
 
 Definition型リスト内では代わりにHTMLタグを使わないといけないので
@@ -168,20 +177,22 @@ Definition型リスト内では代わりにHTMLタグを使わないといけな
 </dl>
 ```
 
+<div>
 <dl>
   <dt>リンゴ</dt>
   <dd> とても<strong>赤い</strong>フルーツ </dd>
 </dl>
+</div>
 
 こうなる。
 Markdown記法とHTMLタグの対応は以下のようになっている。
 
 |修飾|Markdown|HTML|
 |:---:|:---:|:---:|
-|ボールド|****|\<strong>\</strong>|
-|イタリック|\_ \_|\<em>\</em>|
-|コード|\`\`|\<code>\</code>|
-|リンク|\[text]\(url)|\<a href="url">text\</a>|
+|ボールド|****|`<strong> </strong>`|
+|イタリック|\_ \_|`<em> </em>`|
+|コード|\`\`|`<code> </code>`|
+|リンク|\[text]\(url)|`<a href="url"> text </a\>`|
 
 ### Checkbox型
 
@@ -192,7 +203,7 @@ Disc型の記述の後ろに\[ ]を入れるとチェックボックスができ
 
 なぜかできない
 
-## Blockquotes - 引用
+## 引用
 
 >文頭に \> を置くことで引用できる。
 >複数行の時は改行のたびにこの記号を置く必要がある。
@@ -205,7 +216,7 @@ Disc型の記述の後ろに\[ ]を入れるとチェックボックスができ
 
 こんな感じに
 
-## Horizontal rules - 水平線
+## 水平線
 
 これらは全部水平線になる
 
@@ -219,7 +230,7 @@ Disc型の記述の後ろに\[ ]を入れるとチェックボックスができ
 こんな感じの線になる
 ***
 
-## Links - リンク
+## リンク
 
 - リンク付きテキスト
 \[リンクテキスト](URL)
@@ -252,7 +263,7 @@ Markdown:
 [link-1]:http:qiita.com
 なぜかできないけど
 
-## Images - 画像埋め込み
+## 画像埋め込み
 
 2パターンある
 
@@ -413,7 +424,11 @@ PDFに変換したときに改ページするには以下のcssを改ページ�
 ```
 ## その他
 
+### markdown enhance preview のエラーについて
 プレビューで`<p data-line="232" class="sync-line" style="margin:0;"></p>`と表示されることがあるけど、バグ。PDFに変換するとなくなる。
+
+### HTMLについて
+Markdown内でHTMLタグを使うときは、その範囲をdivタグで囲まないとそれ以降が正常に動いてくれない可能性がある。
 
 ## 参考資料
 
