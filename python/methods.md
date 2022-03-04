@@ -24,3 +24,20 @@ if re.search(pattern, string):
 else:
     print("fault")
 ```
+
+## 正規表現での文字列置換(re.sub)
+第一引数に正規表現パターン、第二引数に置換先文字列、第三引数に処理対象文字列を指定。
+
+```python
+import re
+s = 'aaa@xxx.com bbb@yyy.com ccc@zzz.com'
+
+print(re.sub('[a-z]*@', 'ABC@', s))
+# ABC@xxx.com ABC@yyy.com ABC@zzz.com
+```
+
+第四引数に最大置換回数を指定できる。
+```python
+print(re.sub('[a-z]*@', 'ABC@', s, 2))
+# ABC@xxx.com ABC@yyy.com ccc@zzz.com
+```
