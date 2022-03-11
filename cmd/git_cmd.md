@@ -19,7 +19,7 @@ $ git config user.email
 local, system, globalそれぞれにおける項目の設定値を確認したい場合はオプションを付ける
 ```
 $ git config --local <name>
-$ git config --global <name>]
+$ git config --global <name>
 $ git config --system <name>
 ```
 
