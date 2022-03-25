@@ -6,6 +6,12 @@
   - [1.2. JSONの取り扱い](#12-jsonの取り扱い)
     - [1.2.1. JSONファイル](#121-jsonファイル)
     - [1.2.2. 辞書をJSON形式の文字列として出力](#122-辞書をjson形式の文字列として出力)
+  - [1.3. any, all](#13-any-all)
+    - [1.3.1. all](#131-all)
+    - [1.3.2. any](#132-any)
+  - [1.4. コマンドライン引数の制御](#14-コマンドライン引数の制御)
+    - [1.4.1. sys.argv](#141-sysargv)
+    - [1.4.2. argsparseモジュール](#142-argsparseモジュール)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -106,3 +112,68 @@ sd = json.dumps(d)
     # }
     ```
     デフォルトは`indent=None`で改行なし、`indent=0`でインデントはなしで改行だけされる
+
+## 1.3. any, all
+### 1.3.1. all
+すべての要素がTrueであればTrueを返す
+
+### 1.3.2. any
+いずれかの要素がTrueであればTrueを返す。
+配列内の文字列のどれかが含まれるかどうかの例
+```python
+lists = ["a","b","c"]
+text = "axy"
+any(word in text for word in lists)
+# True
+```
+
+## 1.4. コマンドライン引数の制御
+### 1.4.1. sys.argv
+`sys`をインポートする
+使用するには`sys.argv[n]`のようにする。
+この時n=0には実行したファイル名、それ以降はコマンドライン引数が格納されている
+```python
+# 以下のコマンドで実行したとする
+# python test.py sample1 sample2
+import sys
+print(sys.argv[0]) # test.py
+print(sys.argv[1]) # sample1
+print(sys.argv[2]) # sample2
+```
+
+### 1.4.2. argsparseモジュール
+
+必要な流れは以下
+1. argsparseモジュールをインポート
+2. argsparse.ArgumentParserクラスのインスタンス作成
+3. add_argumentメソッドで解析方法を追加していく
+4. parse_argsメソッドで与えられたコマンドライン引数を解析
+5. コマンドライン引数の値がparse_argsの戻り値に格納
+
+以下簡単な例
+```python
+import argparse  # argparseモジュールのインポート
+
+parser = argparse.ArgumentParser()  # ArgumentParserクラスのインスタンスを生成
+parser.add_argument('x', type=int)  # コマンドライン引数の解析方法を追加（1）
+parser.add_argument('y', type=int)  # コマンドライン引数の解析方法を追加（2）
+args = parser.parse_args()  # コマンドライン引数の解析
+result = args.x + args.y  # 戻り値に格納された値を使用
+
+print(result)
+```
+
+```python
+parser = argparse.ArgumentParser(description="test")
+parser.add_argument("x",type=int,help="an integer to be added") # 基本の形
+parser.add_argument("-y",type=int,default=0) # --option value形式
+parser.add_argument("-s","--switch",action="store_true") # --option 形式のフラグ、スイッチ
+args.parser.parse_args()
+
+result = args.x+args.y
+
+if args.switch:
+    print("result: "+str(result)+" and switch on")
+else:
+    print("result: "+str(result)+" and switch off")
+```
