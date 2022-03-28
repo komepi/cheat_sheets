@@ -12,6 +12,22 @@
   - [1.4. コマンドライン引数の制御](#14-コマンドライン引数の制御)
     - [1.4.1. sys.argv](#141-sysargv)
     - [1.4.2. argsparseモジュール](#142-argsparseモジュール)
+  - [pathlib](#pathlib)
+    - [Pathオブジェクト生成・処理](#pathオブジェクト生成処理)
+    - [パスの存在・種類](#パスの存在種類)
+    - [取得](#取得)
+      - [ファイル名、ディレクトリ名：name, stem](#ファイル名ディレクトリ名name-stem)
+      - [拡張子：suffix](#拡張子suffix)
+      - [親ディレクトリ](#親ディレクトリ)
+      - [カレントディレクトリ：cwd](#カレントディレクトリcwd)
+      - [同じディレクトリの別のファイル：with_name()](#同じディレクトリの別のファイルwith_name)
+      - [拡張子を変更したパス：with_suffix](#拡張子を変更したパスwith_suffix)
+    - [連結・追加](#連結追加)
+    - [絶対パス↔相対パス](#絶対パス相対パス)
+    - [その他](#その他)
+      - [パスの同一判定：samefile](#パスの同一判定samefile)
+      - [str型への変換](#str型への変換)
+      - [osモジュールとpathlibの対応](#osモジュールとpathlibの対応)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -177,3 +193,196 @@ if args.switch:
 else:
     print("result: "+str(result)+" and switch off")
 ```
+
+## pathlib
+ファイル・ディレクトリ（フォルダ）のパスをオブジェクトとして捜査する。
+以下のようなディレクトリ構造を例とする。
+```
+temp
+├── dir
+│   └── sub_dir
+│       └── file2.txt
+└── file.txt
+```
+
+### Pathオブジェクト生成・処理
+コンストラクタ`pathlib.Path()`でPathオブジェクトを生成。引数にはパス（絶対パス、相対パス）を文字列で与える。
+```python
+import pathlib
+p_file = pathlib.Path("temp/file.txt")
+print(p_file)
+# temp/file.txt
+print(type(p_file))
+# <class 'pathlib.PosifixPath'>
+```
+PathのクラスはUnix系のOSだと`PosifixPath`、Windowsで実行すると`WindowsPath`になる。
+
+### パスの存在・種類
+* 存在
+    Pathオブジェクトは存在しないパスを指定しても生成することができる。
+    また`is_exist`メソッドを用いて存在を確認できる。存在するときは`True`を返す。
+    また、`touch`メソッドを用いることで存在しないパスから新しいファイルやディレクトリを作成することもできる。
+    ```python
+    p_file = Path('temp/new_file.txt')
+    print(p_file.is_exist())
+    # False
+    p_file.touch()
+    print(p_file.is_exist())
+    # True
+    ```
+    また`Path('temp/new_file.txt').touch()`のように一文でもできる
+
+* 種類
+    パスがファイル、ディレクトリかどうかの確認にはそれぞれ`is_file`、`is_dir`メソッドを用いる。その種類であるときは`True`が返ってくる。
+
+### 取得
+#### ファイル名、ディレクトリ名：name, stem
+パス末尾のファイル名（basename）の文字列を取得するには`name`属性を使う。
+拡張子なしでの取得には`stem`属性を使う。
+またディレクトリを示すPathオブジェクトの場合は、どちらも末尾のディレクトリ名の文字列を返す。
+```python
+p_file = Path('temp/file.txt')
+print(p_file.name)
+# file.txt
+print(p_file.stem)
+# file
+p_dir = Path('temp/dir')
+print(p_dir.name)
+# dir
+print(p_dir.stem)
+# dir
+```
+
+#### 拡張子：suffix
+拡張子は`suffix`属性で取得。このときピリオド`.`付き文字列となる。
+またディレクトリの場合は空文字列になる。
+```python
+p_file = Path('temp/file.txt')
+print(p_file.suffix)
+# .txt
+p_dir = Path('temp/dir')
+print(p_dir.suffix)
+# 
+```
+ピリオドが必要ない場合は`lstrip('.')`で削除するか、スライスで2文字目意向を取得(`p_file.suffix[1:]`)
+#### 親ディレクトリ
+パスに対して相対パス`..`を連結すると親ディレクトリへの移動になる。
+```python
+path = Path('temp/dir').joinpath('..','file.txt')
+print(path)
+# temp/dir/../file.txt
+```
+`parent`属性を使うことでも移動可能
+```python
+print(p_dir)
+# temp/dir
+print(p_dir.parent)
+# temp
+print(p_dir.parent.joinpath('file.txt'))
+# temp/file.txt
+```
+
+#### カレントディレクトリ：cwd
+pythonが実行されている作業ディレクトリ（カレントディレクトリ）は`cwd`メソッドで取得できる。
+```python
+print(Path.cwd())
+# /Users/mbp/Documents/my-project/python-snippets/notebook
+```
+#### 同じディレクトリの別のファイル：with_name()
+`with_name`を使うと、現在のパスの`name`属性を変更したPathオブジェクトが返される。引数に新たな`name`属性を指定。
+これはファイルを対象としたPathオブジェクトでもディレクトリを対象としたPathオブジェクトでも同じ。
+また、`with_name`は`name`属性の変更であるため、ディレクトリを対象としたPathオブジェクトに新たなファイル名を指定することもできる。
+```python
+p_file = Path('temp/file.txt')
+print(p_file.with_name('new_file.txt'))
+# temp/new_file.txt
+p_dir = Path('temp/dir')
+print(p_dir.with_name('new_dir'))
+# temp/new_dir
+print(p_dir.with_name('new_file.txt'))
+# temp/new_file.txt
+```
+
+#### 拡張子を変更したパス：with_suffix
+元のパスの`suffix`属性を変更したPathオブジェクトを返す。引数で新たな拡張子を文字列で指定する。
+この時、先頭にピリオドがないとエラーを返す。
+```python
+p_file = Path('temp/file.txt')
+print(p_file.with_suffix('.csv'))
+# temp/file.csv
+print(p_file.with_suffix('csv'))
+# ValueError: Invalid suffix 'csv'
+```
+### 連結・追加
+Pathオブジェクトに対して`/`演算子を使ってパスを追加できる。
+また、`joinpath`メソッドも同様の動きをする。複数連結する場合は引数に複数渡す。
+```python
+path = Path('temp/dir')
+# 以下は同じ処理
+print(path / 'sub_dir' / 'file2.txt')
+print(path.joinpath('sub_dir', 'file2.txt'))
+```
+
+### 絶対パス↔相対パス
+* 相対パス→絶対パス
+    `resolve`メソッドを使用
+    ```python
+    path = Path('temp/dir').joinpath('..','file.txt')
+    # temp/dir/../file.txt
+    print(path.resolve())
+    # /Users/mbp/Documents/my-project/python-snippets/notebook/temp/file.txt
+    ```
+    またこの時resolveが返すのはPathオブジェクト（str型ではない）
+* 絶対パス→相対パス
+    `relative_to`メソッドで変換。引数に指定したパスを基準とする相対パスを返す
+    ```python
+    p_file_join = Path('tmep/dir').joinpath('..','file.txt')
+    p_resolve = p_file_join.resolve()
+    # /Users/mbp/Documents/my-project/python-snippets/notebook/temp/file.txt
+    p_cwd = Path.cwd()
+    # /Users/mbp/Documents/my-project/python-snippets/notebook
+    print(p_resolve.relative_to())
+    # temp/file.txt
+
+### その他
+
+#### パスの同一判定：samefile
+パスが参照するファイルが同一かどうかを判定。相対パスと絶対パスなどを判定する。この場合は`==`演算子では一致しない
+```python
+print(p_file1)
+# temp/file.txt
+print(p_file2)
+# temp/dir/../file.txt
+print(p_file1.samefile(p_file2))
+# True
+print(p_file1 == p_file2)
+# False
+```
+#### str型への変換
+Path型のオブジェクトを`print`で出力すると文字列が表示されるが、あくまで型は`Path`で`str`ではない
+文字列に変換したい場合は`str()`を用いる。
+```python
+path = Path('temp/file.txt')
+print(type(path))
+# <class 'pathlib.PosifixPath'>
+print(type(str(path)))
+# <class 'str'>
+```
+なお、nameでファイル名を文字列で取得したりsuffix属性で拡張子を文字列で取得もできる。
+
+#### osモジュールとpathlibの対応
+|処理内容|osおよびos.path|pathlib|
+|:--|:--|:--|
+|カレントディレクトリ取得|`os.getcwd()`|`Path.cwd()`|
+|先頭の`~`をホームディレクトリに置換|`os.path.expanduser()`|`Path.expanduser()`, `Path.home()`|
+|パスの存在確認|`os.path.exists()`|`Path.exists()`|
+|ディレクトリ判定|`os.path.isdir()`|`Path.is_dir()`|
+|ファイル判定|`os.path.isfile()`|`Path.is_file()`|
+|シンボリックリンク判定|`os.path.islink()`|`Path.is_symlink()`|
+|絶対パス判定|`os.path.isabs()`|`PurePath.is_absolute()`|
+|絶対パスに変換|`os.path.abspath()`|`Path.resolve()`|
+|ステータスを取得|`os.stat()`|`Path.stat()`<br>`Path.owner()`<br>`Path.group()`|
+|パス連結|`os.path.join()`|`PurePath.joinpath()`|
+|ファイル名取得|`os.path.basename()`|`PurePath.name`|
+|親ディレクトリ取得|`os.path.dirname()`|`PurePath.parent`|
+|拡張子分割・取得|`os.path.splitext()`|`PurePath.suffix`
