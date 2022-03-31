@@ -22,6 +22,10 @@
       - [カレントディレクトリ：cwd](#カレントディレクトリcwd)
       - [同じディレクトリの別のファイル：with_name()](#同じディレクトリの別のファイルwith_name)
       - [拡張子を変更したパス：with_suffix](#拡張子を変更したパスwith_suffix)
+    - [作成](#作成)
+      - [ディレクトリ](#ディレクトリ)
+    - [削除](#削除)
+      - [ディレクトリ](#ディレクトリ-1)
     - [連結・追加](#連結追加)
     - [絶対パス↔相対パス](#絶対パス相対パス)
     - [その他](#その他)
@@ -220,14 +224,14 @@ PathのクラスはUnix系のOSだと`PosifixPath`、Windowsで実行すると`W
 ### パスの存在・種類
 * 存在
     Pathオブジェクトは存在しないパスを指定しても生成することができる。
-    また`is_exist`メソッドを用いて存在を確認できる。存在するときは`True`を返す。
+    また`exists`メソッドを用いて存在を確認できる。存在するときは`True`を返す。
     また、`touch`メソッドを用いることで存在しないパスから新しいファイルやディレクトリを作成することもできる。
     ```python
     p_file = Path('temp/new_file.txt')
-    print(p_file.is_exist())
+    print(p_file.exists())
     # False
     p_file.touch()
-    print(p_file.is_exist())
+    print(p_file.exists())
     # True
     ```
     また`Path('temp/new_file.txt').touch()`のように一文でもできる
@@ -313,6 +317,40 @@ print(p_file.with_suffix('.csv'))
 print(p_file.with_suffix('csv'))
 # ValueError: Invalid suffix 'csv'
 ```
+
+### 作成
+#### ディレクトリ
+Pathオブジェクトの`mkdir`メソッドで作成可能
+```python
+p = pathlib.Path('temp')
+p.mkdir()
+print(p.exists())
+# True
+print(p.is_dir())
+# True
+```
+引数`parents`を`True`にすると、Pathオブジェクトの中間ディレクトリも作成できる。
+デフォルトではエラーとなる
+```python
+p = pathlib.Path('temp/dir/sub_dir/sub_dir2').mkdir(parents=True)
+```
+
+引数`exist_ok`では、すでに存在しているディレクトリを対象としていてもエラーにならない。デフォルトではエラーになる。
+```python
+p=Path('temp/dir')
+print(p.exists())
+# True
+p.mkdir(exist_ok=True)
+```
+
+### 削除
+#### ディレクトリ
+ディレクトリの削除には`rmdir`メソッドを使う。
+```python
+p=Path('temp/dir')
+p.rmdir()
+```
+
 ### 連結・追加
 Pathオブジェクトに対して`/`演算子を使ってパスを追加できる。
 また、`joinpath`メソッドも同様の動きをする。複数連結する場合は引数に複数渡す。
