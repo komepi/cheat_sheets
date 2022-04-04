@@ -32,6 +32,13 @@
       - [パスの同一判定：samefile](#パスの同一判定samefile)
       - [str型への変換](#str型への変換)
       - [osモジュールとpathlibの対応](#osモジュールとpathlibの対応)
+  - [変換](#変換)
+    - [大文字小文字](#大文字小文字)
+      - [全ての文字を小文字に: lower](#全ての文字を小文字に-lower)
+      - [全ての文字を大文字に: upper](#全ての文字を大文字に-upper)
+      - [最初を大文字、他は小文字に：capitalize](#最初を大文字他は小文字にcapitalize)
+      - [単語ごとに最初を大文字に、他は小文字に：title](#単語ごとに最初を大文字に他は小文字にtitle)
+      - [大文字を小文字に、小文字を大文字に: swapcase](#大文字を小文字に小文字を大文字に-swapcase)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -424,3 +431,41 @@ print(type(str(path)))
 |ファイル名取得|`os.path.basename()`|`PurePath.name`|
 |親ディレクトリ取得|`os.path.dirname()`|`PurePath.parent`|
 |拡張子分割・取得|`os.path.splitext()`|`PurePath.suffix`
+
+## 変換
+### 大文字小文字
+#### 全ての文字を小文字に: lower
+`str.lower()`ですべての文字を小文字に変換する。
+```python
+word = "Hello"
+print(word.lower())
+# hello
+```
+#### 全ての文字を大文字に: upper
+`str.upper()`ですべての文字を大文字に変換する。
+```python
+word = "Hello"
+print(word.upper())
+# HELLO
+```
+#### 最初を大文字、他は小文字に：capitalize
+`str.capitalize()`で先頭を大文字に、それ以降を小文字に変換できる。
+```python
+word = "hello python"
+print(word.capitalize())
+# Hello python
+```
+#### 単語ごとに最初を大文字に、他は小文字に：title
+`str.title()`で文字列に含まれる単語ごとに最初の文字を大文字に、それ以外の文字を小文字に変換する。
+```python
+word = "hello python"
+print(word.title())
+# Hello Python
+```
+#### 大文字を小文字に、小文字を大文字に: swapcase
+`str.swapcase()`で大文字を小文字に、小文字を大文字に変換する。
+```python
+word = "Hello"
+print(word.swapcase())
+# hELLO
+```
