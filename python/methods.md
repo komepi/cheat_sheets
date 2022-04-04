@@ -39,6 +39,13 @@
       - [最初を大文字、他は小文字に：capitalize](#最初を大文字他は小文字にcapitalize)
       - [単語ごとに最初を大文字に、他は小文字に：title](#単語ごとに最初を大文字に他は小文字にtitle)
       - [大文字を小文字に、小文字を大文字に: swapcase](#大文字を小文字に小文字を大文字に-swapcase)
+  - [文字列からメソッドを実行](#文字列からメソッドを実行)
+    - [関数を変数に代入：getattr](#関数を変数に代入getattr)
+    - [文字列から関数を呼び出す：locals, globals](#文字列から関数を呼び出すlocals-globals)
+  - [可変長引数:*args, **kwargs](#可変長引数args-kwargs)
+    - [*args](#args)
+    - [**kwargs](#kwargs)
+- [3](#3)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -469,3 +476,118 @@ word = "Hello"
 print(word.swapcase())
 # hELLO
 ```
+
+## 文字列からメソッドを実行
+### 関数を変数に代入：getattr
+オブジェクト、もしくはモジュールから属性の値を返す。第一引数にオブジェクトもしくはモジュールの名前、第二引数には属性の名前を含む文字列の値を渡す。
+いかのUserクラスがあるとする。
+```python
+# Filename: user.py
+class User():
+  name = 'John'
+  age = 33
+  def doSomething():
+    print(name + ' did something.')
+```
+このdoSomethingを変数に入れ、それを用いて実行する。
+```python
+from user import User
+doSomething = getattr(user, 'doSomething')
+
+doSomething(user)
+# John did something.
+```
+
+### 文字列から関数を呼び出す：locals, globals
+組み込み関数の`locals`と`globals`を用いて文字列からメソッドを実行できる。これらの関数はソースコードの現在のシンボルテーブルを表すpython辞書を返す。
+このとき`locals`はローカル変数を含む辞書を返し、`globals`はローカル変数を含む辞書を返す。関数名も文字列の形式で返される。
+```python
+def myFunc(args):
+  print('This is '+args+' function.')
+
+def myFunc2(args):
+  print('This is another '+args+'function.')
+
+locals()['myFunc']('plus')
+# This is plus function.
+globals()['myFunc2']('minus')
+# This is minus function.
+```
+
+## 可変長引数:*args, **kwargs
+引数に`*`と`**`を付けることで、可変長引数を指定できる。この時変数名はargsやkwargsでなくてもいい（大事なのはアスタリスク）
+それぞれ以下の意味を持つ
+* `*args`:複数の引数をタプルで受け取る。
+* `**kwargs`:複数のキーワード引数を辞書で受け取る。
+
+### *args
+以下に例
+```python
+def func_args(arg1, arg2, *args):
+  print('arg1: ', arg1)
+  print('arg2: ', arg2)
+  print('args: ', args)
+  print('type: ', type(args))
+  print('sum: ' sum(args))
+
+func_args(0, 1, 2, 3, 4)
+# arg1: 0
+# arg2: 1
+# args: (2, 3, 4)
+# type: <class 'tuple'>
+# sum: 9
+func_args(0, 1)
+# arg1: 0
+# arg2: 1
+# args: ()
+# type: <class 'tuple'>
+# sum: 0
+```
+
+以下のように`*`が付いた引数の後ろで定義されているものはキーワード形式`引数名=値`で指定する。
+```python
+def func_args2(arg1, *args, arg2):
+    print('arg1: ', arg1)
+    print('arg2: ', arg2)
+    print('args: ', args)
+
+# func_args2(0, 1, 2, 3, 4)
+# TypeError: func_args2() missing 1 required keyword-only argument: 'arg2'
+
+func_args2(0, 1, 2, 3, arg2=4)
+# arg1:  0
+# arg2:  4
+# args:  (1, 2, 3)
+```
+
+### **kwargs
+`**kwargs`のように`**`を付けた引数を定義すると任意の数のキーワード引数を指定できる。
+この時関数の中では引数名がキー`key`、値が`value`となる辞書として受け取られる。
+```python
+def func_kwargs_positional(arg1, arg2, **kwargs):
+    print('arg1: ', arg1)
+    print('arg2: ', arg2)
+    print('kwargs: ', kwargs)
+
+func_kwargs_positional(0, 1, key1=1)
+# arg1:  0
+# arg2:  1
+# kwargs:  {'key1': 1}
+```
+関数呼び出し時に辞書型オブジェクトに`**`を付けて渡すことができる。
+```python
+d = {'key1': 1, 'key2': 2, 'arg1': 100, 'arg2': 200}
+
+func_kwargs_positional(**d)
+# arg1:  100
+# arg2:  200
+# kwargs:  {'key1': 1, 'key2': 2}
+```
+メソッドで`**`付き引数を定義しなくても渡すときに`**`を付けて渡すこともできる
+```python
+def func_test(a, b):
+  return a + b
+
+d = {"a": 1, "b": 2}
+func_test(**d)
+# 3
