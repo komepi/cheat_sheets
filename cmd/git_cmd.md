@@ -35,3 +35,18 @@ $ git config --system <name>
 * `core.editor`: コミットメッセージなどの編集で用いるエディタ
 * `user.name`: ユーザー名
 * `user.email`: Eメールアドレス
+
+## git clone
+リポジトリをローカルにコピーする。
+
+### ブランチ・タグを指定して取得
+`-b`オプションを使用することでブランチ・タグを指定して取得できる。
+```
+git clone [RepositoryURL] -b [branch/tag name]
+```
+### ディレクトリ名を指定して取得
+基本的には指定しないとリポジトリ名がディレクトリ名となる。
+以下のように指定もできる
+```
+git clone [RepositoryURL] [directory name]
+```
