@@ -25,11 +25,3 @@ docker-compose down --rmi all --volumes --remove-orphans
     `docker-compose.yml`で定義から削除されたサービス用の未定義コンテナも削除される。
     
 これらのオプションを付けないと削除されるのはコンテナとネットワークのみ。
-
-### ブランチ
-下記いずれかのコマンドでブランチ作成
-```
-git branch [ブランチ名]
-
-git checkout -b [ブランチ名]
-```
