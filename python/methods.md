@@ -12,6 +12,9 @@
   - [1.4. コマンドライン引数の制御](#14-コマンドライン引数の制御)
     - [1.4.1. sys.argv](#141-sysargv)
     - [1.4.2. argsparseモジュール](#142-argsparseモジュール)
+  - [ディレクトリ関係](#ディレクトリ関係)
+    - [親ディレクトリのモジュールインポート](#親ディレクトリのモジュールインポート)
+    - [カレントディレクトリ取得](#カレントディレクトリ取得)
   - [pathlib](#pathlib)
     - [Pathオブジェクト生成・処理](#pathオブジェクト生成処理)
     - [パスの存在・種類](#パスの存在種類)
@@ -211,6 +214,18 @@ if args.switch:
     print("result: "+str(result)+" and switch on")
 else:
     print("result: "+str(result)+" and switch off")
+```
+## ディレクトリ関係
+### 親ディレクトリのモジュールインポート
+### カレントディレクトリ取得
+`os.getcwd()`で取得できる
+```python
+import os
+path = os.getcwd()
+print(path)
+# /Users/mbp/Documents/my-project/python-snippets/notebook
+print(type(path))
+# <class 'str'>]
 ```
 
 ## pathlib
