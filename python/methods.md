@@ -49,7 +49,13 @@
   - [可変長引数:*args, **kwargs](#可変長引数args-kwargs)
     - [*args](#args)
     - [**kwargs](#kwargs)
-- [3](#3)
+  - [pickle](#pickle)
+    - [pickle化対象](#pickle化対象)
+    - [シリアライズとデシリアライズ](#シリアライズとデシリアライズ)
+      - [通常オブジェクト](#通常オブジェクト)
+      - [クラスのインスタンス](#クラスのインスタンス)
+      - [クラスや関数](#クラスや関数)
+    - [pickleと_pickle](#pickleと_pickle)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -614,3 +620,97 @@ def func_test(a, b):
 d = {"a": 1, "b": 2}
 func_test(**d)
 # 3
+```
+
+## pickle
+オブジェクトの直列化（シリアライズ）とその復元（デシリアライズ）ができる。
+### pickle化対象
+pickle化できるものは以下のようになる。
+* None値、boolean値（True/False）
+* 整数値、浮動小数点数値、複素数値
+* 文字列、バイト列（bytesオブジェクト）、バイト配列（bytearrayオブジェクト）
+* pickle化可能なオブジェクトだけを要素とするリスト、タプル、辞書、集合
+* モジュールトップレベルで定義された組み込み関数、関数（ラムダ式を除く）、クラス
+* __dict__属性の値がpickle化可能なクラスのインスタンス。または__getstate__メソッドの戻り値がpickle化可能なクラスのインスタンス
+
+これ以外のファイルオブジェクトなどはpickle化できない
+### シリアライズとデシリアライズ
+pickle化には`dump`、非pickle化には`load`を使用する
+#### 通常オブジェクト
+```python
+favs = ['beer', 'sake']
+mydata = {'name':'田中', 'age':999,'weight':123.4,'favs':favs}
+
+# pickle化して書き込み
+with open('pickled.pkl', 'wb') as f:
+  pickle.dump(mydata, f)
+
+# 非pickle化
+with open('pickled.pkl', 'rb') as f:
+  mydata2 = pickle.load(f)
+  favs2 = mydata2['favs']
+```
+この時mydataとmydata2は値は同じ（mydata == mydata2 = True)だが、オブジェクトは同じではない（mydata is mydata2 = False）
+#### クラスのインスタンス
+また、クラスのインスタンスもpickle化することができる
+```python
+class Foo:
+  def __init__(self, name, age):
+    self.name = name
+    self.age = age
+
+foo = Foo('田中', 999)
+with open('pickled.pkl', 'wb') as f:
+  pickle.dump(foo, f)
+
+del foo
+with open('pickle.pkl', 'rb') as f:
+  foo = pickle.load(f)
+```
+この時pickle化できるのはそれぞれの変数が持つ値のみで、クラスの構造はpickle化できない。
+すなわち、非pickle化するときにはそのプログラム上でFooクラスを定義していないといけない。
+またクラス名が同じであるが別のクラスを定義していた場合、復元できてしまう。
+```python
+class Foo:
+  def __init__(self, name, age):
+    self.name = name
+    self.age = age
+foo = Foo('たなか', 99)
+with open('pickled.pkl', 'wb') as f:
+  pickle.dump(foo, f)
+del Foo, foo
+with open('pickled.pkl', 'rb') as f:
+  foo = pickle.load(f) # FooクラスがないのでAttributeError
+
+class Foo:
+  def __init__(self, a, b):
+    self.a = a
+    self.b = b
+
+with open('pickled.pkl', 'rb') as f:
+  foo = pickle.load(f) # 復元できる
+print(foo.a) # AttributeError (復元したfooにはa属性がない)
+```
+#### クラスや関数
+関数やクラス事態をpickle化することもできる
+```python
+class Foo:
+  def __init__(self, name, age):
+    self.name = name
+    self.age = age
+def hello():
+  print('hello')
+
+with open('pickled.pkl', 'wb') as f:
+  pickle.dump(Foo, f)
+  pickle.dump(hello, f)
+
+with open('pickled.pkl', 'rb') as f:
+  Bar = pickle.load(f) # FooクラスをBarクラスに復元
+  greet = pickle.load(f) # hello関数をgreet関数に復元
+```
+ただし関数やクラスのコードそのものがpickle化されたのではなく、完全修飾された名前参照（それが定義されているモジュール名と関数名またはクラス名だけ）がpickle化されている。そのため関数やクラスを非pickle化するときはその関数やクラスを定義しているモジュールがインポートされている必要がある。
+### pickleと_pickle
+_pickleはC言語的に最適化されたもの？python2ではCPickleという名称だった
+基本的には使用可能な場合自動的に_pickleが適用される。そのため_pickleを直接インポートする必要がない。
+
