@@ -56,6 +56,8 @@
       - [クラスのインスタンス](#クラスのインスタンス)
       - [クラスや関数](#クラスや関数)
     - [pickleと_pickle](#pickleと_pickle)
+  - [その他組み込み関数](#その他組み込み関数)
+    - [型判定: isinstance](#型判定-isinstance)
 
 ## 1.1. 正規表現
 ### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -714,3 +716,24 @@ with open('pickled.pkl', 'rb') as f:
 _pickleはC言語的に最適化されたもの？python2ではCPickleという名称だった
 基本的には使用可能な場合自動的に_pickleが適用される。そのため_pickleを直接インポートする必要がない。
 
+## その他組み込み関数
+### 型判定: isinstance
+1番目の引数に指定したオブジェクトが2番目の引数に指定したデータ型と等しいかどうかを返す
+```python
+isinstance(object, classinfo)
+```
+以下使用例
+```python
+isinstance(1, int)
+>> True
+isinstance(1, str)
+>> False
+isinstance({"a":1}, dict)
+>> True
+```
+複数のデータ型と比較したい場合には、第二引数をタプルにする。or条件なのでどれかと一致すればTrue
+```python
+isinstance(1, (str, int))
+>> True
+```
+type関数の違いとしては、isinstance
