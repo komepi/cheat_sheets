@@ -47,3 +47,11 @@ docker-compose down --rmi all --volumes --remove-orphans
     `docker-compose.yml`で定義から削除されたサービス用の未定義コンテナも削除される。
     
 これらのオプションを付けないと削除されるのはコンテナとネットワークのみ。
+
+### logの見方
+#### ホストに存在するログ
+以下のコマンドでパスが取得できる
+```cmd
+$ docker inspect {コンテナidやname} | grep 'LopPath'
+```
+このパスの先のファイルの閲覧をしようとすると権限がないといわれることがあるので、その時はsudoなどを使用する。

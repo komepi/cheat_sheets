@@ -1,66 +1,84 @@
-# 1. pythonでよく使いそうなメソッド
-- [1. pythonでよく使いそうなメソッド](#1-pythonでよく使いそうなメソッド)
-  - [1.1. 正規表現](#11-正規表現)
-    - [1.1.1. 正規表現での文字列抽出(re.search, re.findall)](#111-正規表現での文字列抽出research-refindall)
-    - [1.1.2. 正規表現での文字列置換(re.sub)](#112-正規表現での文字列置換resub)
-  - [1.2. JSONの取り扱い](#12-jsonの取り扱い)
-    - [1.2.1. JSONファイル](#121-jsonファイル)
-    - [1.2.2. 辞書をJSON形式の文字列として出力](#122-辞書をjson形式の文字列として出力)
-  - [1.3. any, all](#13-any-all)
-    - [1.3.1. all](#131-all)
-    - [1.3.2. any](#132-any)
-  - [1.4. コマンドライン引数の制御](#14-コマンドライン引数の制御)
-    - [1.4.1. sys.argv](#141-sysargv)
-    - [1.4.2. argsparseモジュール](#142-argsparseモジュール)
-  - [ディレクトリ関係](#ディレクトリ関係)
-    - [親ディレクトリのモジュールインポート](#親ディレクトリのモジュールインポート)
-    - [カレントディレクトリ取得](#カレントディレクトリ取得)
-  - [pathlib](#pathlib)
-    - [Pathオブジェクト生成・処理](#pathオブジェクト生成処理)
-    - [パスの存在・種類](#パスの存在種類)
-    - [取得](#取得)
-      - [ファイル名、ディレクトリ名：name, stem](#ファイル名ディレクトリ名name-stem)
-      - [拡張子：suffix](#拡張子suffix)
-      - [親ディレクトリ](#親ディレクトリ)
-      - [カレントディレクトリ：cwd](#カレントディレクトリcwd)
-      - [同じディレクトリの別のファイル：with_name()](#同じディレクトリの別のファイルwith_name)
-      - [拡張子を変更したパス：with_suffix](#拡張子を変更したパスwith_suffix)
-    - [作成](#作成)
-      - [ディレクトリ](#ディレクトリ)
-    - [削除](#削除)
-      - [ディレクトリ](#ディレクトリ-1)
-      - [ファイル](#ファイル)
-    - [連結・追加](#連結追加)
-    - [絶対パス↔相対パス](#絶対パス相対パス)
-    - [その他](#その他)
-      - [パスの同一判定：samefile](#パスの同一判定samefile)
-      - [str型への変換](#str型への変換)
-      - [osモジュールとpathlibの対応](#osモジュールとpathlibの対応)
-  - [変換](#変換)
-    - [大文字小文字](#大文字小文字)
-      - [全ての文字を小文字に: lower](#全ての文字を小文字に-lower)
-      - [全ての文字を大文字に: upper](#全ての文字を大文字に-upper)
-      - [最初を大文字、他は小文字に：capitalize](#最初を大文字他は小文字にcapitalize)
-      - [単語ごとに最初を大文字に、他は小文字に：title](#単語ごとに最初を大文字に他は小文字にtitle)
-      - [大文字を小文字に、小文字を大文字に: swapcase](#大文字を小文字に小文字を大文字に-swapcase)
-  - [文字列からメソッドを実行](#文字列からメソッドを実行)
-    - [関数を変数に代入：getattr](#関数を変数に代入getattr)
-    - [文字列から関数を呼び出す：locals, globals](#文字列から関数を呼び出すlocals-globals)
-  - [可変長引数:*args, **kwargs](#可変長引数args-kwargs)
-    - [*args](#args)
-    - [**kwargs](#kwargs)
-  - [pickle](#pickle)
-    - [pickle化対象](#pickle化対象)
-    - [シリアライズとデシリアライズ](#シリアライズとデシリアライズ)
-      - [通常オブジェクト](#通常オブジェクト)
-      - [クラスのインスタンス](#クラスのインスタンス)
-      - [クラスや関数](#クラスや関数)
-    - [pickleと_pickle](#pickleと_pickle)
-  - [その他組み込み関数](#その他組み込み関数)
-    - [型判定: isinstance](#型判定-isinstance)
+- [1. 正規表現](#1-正規表現)
+  - [1.1. 正規表現での文字列抽出(re.search, re.findall)](#11-正規表現での文字列抽出research-refindall)
+  - [1.2. 正規表現での文字列置換(re.sub)](#12-正規表現での文字列置換resub)
+- [2. JSONの取り扱い](#2-jsonの取り扱い)
+  - [2.1. JSONファイル](#21-jsonファイル)
+  - [2.2. 辞書をJSON形式の文字列として出力](#22-辞書をjson形式の文字列として出力)
+- [3. any, all](#3-any-all)
+  - [3.1. all](#31-all)
+  - [3.2. any](#32-any)
+- [4. コマンドライン引数の制御](#4-コマンドライン引数の制御)
+  - [4.1. sys.argv](#41-sysargv)
+  - [4.2. argsparseモジュール](#42-argsparseモジュール)
+- [5. ディレクトリ関係](#5-ディレクトリ関係)
+  - [5.1. 親ディレクトリのモジュールインポート](#51-親ディレクトリのモジュールインポート)
+    - [5.1.1. パッケージ内で別ディレクトリから](#511-パッケージ内で別ディレクトリから)
+    - [5.1.2. 別ディレクトリからインポート](#512-別ディレクトリからインポート)
+  - [5.2. カレントディレクトリ取得](#52-カレントディレクトリ取得)
+- [6. pathlib](#6-pathlib)
+  - [6.1. Pathオブジェクト生成・処理](#61-pathオブジェクト生成処理)
+  - [6.2. パスの存在・種類](#62-パスの存在種類)
+  - [6.3. 取得](#63-取得)
+    - [6.3.1. ファイル名、ディレクトリ名：name, stem](#631-ファイル名ディレクトリ名name-stem)
+    - [6.3.2. 拡張子：suffix](#632-拡張子suffix)
+    - [6.3.3. 親ディレクトリ](#633-親ディレクトリ)
+    - [6.3.4. カレントディレクトリ：cwd](#634-カレントディレクトリcwd)
+    - [6.3.5. 同じディレクトリの別のファイル：with_name()](#635-同じディレクトリの別のファイルwith_name)
+    - [6.3.6. 拡張子を変更したパス：with_suffix](#636-拡張子を変更したパスwith_suffix)
+  - [6.4. 作成](#64-作成)
+    - [6.4.1. ディレクトリ](#641-ディレクトリ)
+  - [6.5. 削除](#65-削除)
+    - [6.5.1. ディレクトリ](#651-ディレクトリ)
+    - [6.5.2. ファイル](#652-ファイル)
+  - [6.6. 連結・追加](#66-連結追加)
+  - [6.7. 絶対パス↔相対パス](#67-絶対パス相対パス)
+  - [6.8. その他](#68-その他)
+    - [6.8.1. パスの同一判定：samefile](#681-パスの同一判定samefile)
+    - [6.8.2. str型への変換](#682-str型への変換)
+    - [6.8.3. osモジュールとpathlibの対応](#683-osモジュールとpathlibの対応)
+- [7. 変換](#7-変換)
+  - [7.1. 大文字小文字](#71-大文字小文字)
+    - [7.1.1. 全ての文字を小文字に: lower](#711-全ての文字を小文字に-lower)
+    - [7.1.2. 全ての文字を大文字に: upper](#712-全ての文字を大文字に-upper)
+    - [7.1.3. 最初を大文字、他は小文字に：capitalize](#713-最初を大文字他は小文字にcapitalize)
+    - [7.1.4. 単語ごとに最初を大文字に、他は小文字に：title](#714-単語ごとに最初を大文字に他は小文字にtitle)
+    - [7.1.5. 大文字を小文字に、小文字を大文字に: swapcase](#715-大文字を小文字に小文字を大文字に-swapcase)
+- [8. 文字列操作](#8-文字列操作)
+  - [8.1. 置換](#81-置換)
+    - [8.1.1. 文字列を指定して置換：replace](#811-文字列を指定して置換replace)
+- [9. 文字列からメソッドを実行](#9-文字列からメソッドを実行)
+  - [9.1. 関数を変数に代入：getattr](#91-関数を変数に代入getattr)
+  - [9.2. 文字列から関数を呼び出す：locals, globals](#92-文字列から関数を呼び出すlocals-globals)
+- [10. 可変長引数:*args, **kwargs](#10-可変長引数args-kwargs)
+  - [10.1. *args](#101-args)
+  - [10.2. **kwargs](#102-kwargs)
+- [ラムダ式: lambda](#ラムダ式-lambda)
+  - [def との対応](#def-との対応)
+  - [if文](#if文)
+  - [名前について](#名前について)
+- [日時について：datetime](#日時についてdatetime)
+  - [datetimeオブジェクトと現在情報：now](#datetimeオブジェクトと現在情報now)
+    - [datetime ⇒ date](#datetime--date)
+  - [dateオブジェクトと現在日時：today](#dateオブジェクトと現在日時today)
+  - [timeオブジェクト](#timeオブジェクト)
+  - [経過日時や時間差：timedelta](#経過日時や時間差timedelta)
+    - [オブジェクトの作成](#オブジェクトの作成)
+    - [引き算、足し算](#引き算足し算)
+  - [文字列に変換：strftime, 文字列から変換：strptime](#文字列に変換strftime-文字列から変換strptime)
+    - [文字列に変換：strftime](#文字列に変換strftime)
+- [11. pickle](#11-pickle)
+  - [11.1. pickle化対象](#111-pickle化対象)
+  - [11.2. シリアライズとデシリアライズ](#112-シリアライズとデシリアライズ)
+    - [11.2.1. 通常オブジェクト](#1121-通常オブジェクト)
+    - [11.2.2. クラスのインスタンス](#1122-クラスのインスタンス)
+    - [11.2.3. クラスや関数](#1123-クラスや関数)
+  - [11.3. pickleと_pickle](#113-pickleと_pickle)
+  - [deepcopyとの対応](#deepcopyとの対応)
+- [12. その他組み込み関数](#12-その他組み込み関数)
+  - [12.1. 型判定: isinstance](#121-型判定-isinstance)
 
-## 1.1. 正規表現
-### 1.1.1. 正規表現での文字列抽出(re.search, re.findall)
+# 1. 正規表現
+## 1.1. 正規表現での文字列抽出(re.search, re.findall)
 `search(pattern, str)`で正規表現にマッチするstr内の文字列を検索し、最初にヒットしたものを返す。マッチオブジェクトを返すため、文字列の取得は`group()`メソッドを使う。`findall()`メソッドの場合は、マッチするものがすべてリストで返ってくる。
 ```python
 s = 'date: 2021/03/23, time: 05:30'
@@ -85,7 +103,7 @@ else:
     print("fault")
 ```
 
-### 1.1.2. 正規表現での文字列置換(re.sub)
+## 1.2. 正規表現での文字列置換(re.sub)
 第一引数に正規表現パターン、第二引数に置換先文字列、第三引数に処理対象文字列を指定。
 
 ```python
@@ -102,8 +120,8 @@ print(re.sub('[a-z]*@', 'ABC@', s, 2))
 # ABC@xxx.com ABC@yyy.com ccc@zzz.com
 ```
 
-## 1.2. JSONの取り扱い
-### 1.2.1. JSONファイル
+# 2. JSONの取り扱い
+## 2.1. JSONファイル
 * 読み込み
     `json.load()`関数でJSONファイルを辞書型で読み込む
     ```python
@@ -118,7 +136,7 @@ print(re.sub('[a-z]*@', 'ABC@', s, 2))
     with open('data/test.json', 'w') as f:
         json.dump(d, f, indent=4)
     ```
-### 1.2.2. 辞書をJSON形式の文字列として出力
+## 2.2. 辞書をJSON形式の文字列として出力
 `json.dumps()`関数で出力
 ```python
 d = {'A': {'i': 1, 'j': 2}, 'B': [{'X': 1, 'Y': 10},{'X': 2,'Y': 20}],'C': 'あ'}
@@ -159,11 +177,11 @@ sd = json.dumps(d)
     ```
     デフォルトは`indent=None`で改行なし、`indent=0`でインデントはなしで改行だけされる
 
-## 1.3. any, all
-### 1.3.1. all
+# 3. any, all
+## 3.1. all
 すべての要素がTrueであればTrueを返す
 
-### 1.3.2. any
+## 3.2. any
 いずれかの要素がTrueであればTrueを返す。
 配列内の文字列のどれかが含まれるかどうかの例
 ```python
@@ -173,8 +191,8 @@ any(word in text for word in lists)
 # True
 ```
 
-## 1.4. コマンドライン引数の制御
-### 1.4.1. sys.argv
+# 4. コマンドライン引数の制御
+## 4.1. sys.argv
 `sys`をインポートする
 使用するには`sys.argv[n]`のようにする。
 この時n=0には実行したファイル名、それ以降はコマンドライン引数が格納されている
@@ -187,7 +205,7 @@ print(sys.argv[1]) # sample1
 print(sys.argv[2]) # sample2
 ```
 
-### 1.4.2. argsparseモジュール
+## 4.2. argsparseモジュール
 
 必要な流れは以下
 1. argsparseモジュールをインポート
@@ -223,9 +241,83 @@ if args.switch:
 else:
     print("result: "+str(result)+" and switch off")
 ```
-## ディレクトリ関係
-### 親ディレクトリのモジュールインポート
-### カレントディレクトリ取得
+# 5. ディレクトリ関係
+## 5.1. 親ディレクトリのモジュールインポート
+参考：[Pythonの相対インポートで上位ディレクトリ・サブディレクトリを指定 | note.nkmk.me](https://note.nkmk.me/python-relative-import/)
+### 5.1.1. パッケージ内で別ディレクトリから
+以下のようなディレクトリ構造を例とする。
+```
+my_package/
+├── __init__.py
+├── mod1.py
+├── mod2.py
+├── sub_package1
+│   ├── __init__.py
+│   └── sub_mod1.py
+└── sub_package2
+    ├── __init__.py
+    └── sub_mod2.py
+```
+1. mod1.py ← mod2.py
+  ```python
+  # mod1.py
+  from . import mod2
+  ```
+2. mod2.py ← sub_package1/sub_mod1.py
+  ```python
+  # mod2.py
+  from .sub_package1 import sub_mod1
+  ```
+3. sub_package2/sub_mod2.py ← mod1.py
+  ```python
+  from .. import mod1
+  ```
+4. sub_package2/sub_mod2.py ← sub_package1/sub_mod1.pyenv
+  ```python
+  from ..sub_package1 import sub_mod1
+  ```
+  なお`...`（ピリオド3つ）はさらに上の階層（2階層上）となり、`.`を増やすとさらに上の階層を表せる。
+
+この相対インポートでは、`python`コマンドで実行したファイルより上の階層には遡れない。
+
+### 5.1.2. 別ディレクトリからインポート
+以下のようなディレクトリ構造とする。
+```
+dir_import_test/
+├── dir
+│   ├── main_absolute.py
+│   ├── main_relative.py
+│   └── main_sys_path_append.py
+├── dir_for_mod
+│   └── mod2.py
+├── main_base.py
+└── mod1.py
+```
+1. main_base.py ← mod1.py
+  ```python
+  import mod1
+  ```
+2. main_base.py ← dir_for_mod/mod2.py
+  ```python
+  import dir_for_mod.mod2
+  ```
+3. `dir`内ファイル ← dir_for_mod/mod2.pyやmod1.py
+  モジュール探索パスを追加して絶対インポートする
+  dir/main_sys_path_append.pyを例とする
+  ```python
+  # dir/main_sys_path_append.py
+  import os
+  import sys
+  sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+  
+  import mod1
+  import dir_for_mod import mod2
+  ```
+  パスを追加しなくても相対インポートや絶対インポートもできる。ただ、コマンドにオプションが必要だったりカレントディレクトリによってはエラーが発生する。
+  一方パスを追加するとオプションは不要でカレントディレクトリに関わらずインポートできるので、基本はパスの追加でいいと思う。
+  詳細は参考ページを参照。
+
+## 5.2. カレントディレクトリ取得
 `os.getcwd()`で取得できる
 ```python
 import os
@@ -236,7 +328,7 @@ print(type(path))
 # <class 'str'>]
 ```
 
-## pathlib
+# 6. pathlib
 ファイル・ディレクトリ（フォルダ）のパスをオブジェクトとして捜査する。
 以下のようなディレクトリ構造を例とする。
 ```
@@ -247,7 +339,7 @@ temp
 └── file.txt
 ```
 
-### Pathオブジェクト生成・処理
+## 6.1. Pathオブジェクト生成・処理
 コンストラクタ`pathlib.Path()`でPathオブジェクトを生成。引数にはパス（絶対パス、相対パス）を文字列で与える。
 ```python
 import pathlib
@@ -259,7 +351,7 @@ print(type(p_file))
 ```
 PathのクラスはUnix系のOSだと`PosifixPath`、Windowsで実行すると`WindowsPath`になる。
 
-### パスの存在・種類
+## 6.2. パスの存在・種類
 * 存在
     Pathオブジェクトは存在しないパスを指定しても生成することができる。
     また`exists`メソッドを用いて存在を確認できる。存在するときは`True`を返す。
@@ -277,8 +369,8 @@ PathのクラスはUnix系のOSだと`PosifixPath`、Windowsで実行すると`W
 * 種類
     パスがファイル、ディレクトリかどうかの確認にはそれぞれ`is_file`、`is_dir`メソッドを用いる。その種類であるときは`True`が返ってくる。
 
-### 取得
-#### ファイル名、ディレクトリ名：name, stem
+## 6.3. 取得
+### 6.3.1. ファイル名、ディレクトリ名：name, stem
 パス末尾のファイル名（basename）の文字列を取得するには`name`属性を使う。
 拡張子なしでの取得には`stem`属性を使う。
 またディレクトリを示すPathオブジェクトの場合は、どちらも末尾のディレクトリ名の文字列を返す。
@@ -295,7 +387,7 @@ print(p_dir.stem)
 # dir
 ```
 
-#### 拡張子：suffix
+### 6.3.2. 拡張子：suffix
 拡張子は`suffix`属性で取得。このときピリオド`.`付き文字列となる。
 またディレクトリの場合は空文字列になる。
 ```python
@@ -307,7 +399,7 @@ print(p_dir.suffix)
 # 
 ```
 ピリオドが必要ない場合は`lstrip('.')`で削除するか、スライスで2文字目意向を取得(`p_file.suffix[1:]`)
-#### 親ディレクトリ
+### 6.3.3. 親ディレクトリ
 パスに対して相対パス`..`を連結すると親ディレクトリへの移動になる。
 ```python
 path = Path('temp/dir').joinpath('..','file.txt')
@@ -324,13 +416,13 @@ print(p_dir.parent.joinpath('file.txt'))
 # temp/file.txt
 ```
 
-#### カレントディレクトリ：cwd
+### 6.3.4. カレントディレクトリ：cwd
 pythonが実行されている作業ディレクトリ（カレントディレクトリ）は`cwd`メソッドで取得できる。
 ```python
 print(Path.cwd())
 # /Users/mbp/Documents/my-project/python-snippets/notebook
 ```
-#### 同じディレクトリの別のファイル：with_name()
+### 6.3.5. 同じディレクトリの別のファイル：with_name()
 `with_name`を使うと、現在のパスの`name`属性を変更したPathオブジェクトが返される。引数に新たな`name`属性を指定。
 これはファイルを対象としたPathオブジェクトでもディレクトリを対象としたPathオブジェクトでも同じ。
 また、`with_name`は`name`属性の変更であるため、ディレクトリを対象としたPathオブジェクトに新たなファイル名を指定することもできる。
@@ -345,7 +437,7 @@ print(p_dir.with_name('new_file.txt'))
 # temp/new_file.txt
 ```
 
-#### 拡張子を変更したパス：with_suffix
+### 6.3.6. 拡張子を変更したパス：with_suffix
 元のパスの`suffix`属性を変更したPathオブジェクトを返す。引数で新たな拡張子を文字列で指定する。
 この時、先頭にピリオドがないとエラーを返す。
 ```python
@@ -356,8 +448,8 @@ print(p_file.with_suffix('csv'))
 # ValueError: Invalid suffix 'csv'
 ```
 
-### 作成
-#### ディレクトリ
+## 6.4. 作成
+### 6.4.1. ディレクトリ
 Pathオブジェクトの`mkdir`メソッドで作成可能
 ```python
 p = pathlib.Path('temp')
@@ -381,14 +473,14 @@ print(p.exists())
 p.mkdir(exist_ok=True)
 ```
 
-### 削除
-#### ディレクトリ
+## 6.5. 削除
+### 6.5.1. ディレクトリ
 ディレクトリの削除には`rmdir`メソッドを使う。
 ```python
 p=Path('temp/dir')
 p.rmdir()
 ```
-#### ファイル
+### 6.5.2. ファイル
 ファイルの削除には`unlink`メソッドを使う
 第一引数にTrueを指定すると、対象が存在しなくてもエラーを出さない
 ```python
@@ -396,7 +488,7 @@ p=Path('temp/dir/test.txt')
 p.unlink(missing_ok=True)
 ```
 
-### 連結・追加
+## 6.6. 連結・追加
 Pathオブジェクトに対して`/`演算子を使ってパスを追加できる。
 また、`joinpath`メソッドも同様の動きをする。複数連結する場合は引数に複数渡す。
 ```python
@@ -406,7 +498,7 @@ print(path / 'sub_dir' / 'file2.txt')
 print(path.joinpath('sub_dir', 'file2.txt'))
 ```
 
-### 絶対パス↔相対パス
+## 6.7. 絶対パス↔相対パス
 * 相対パス→絶対パス
     `resolve`メソッドを使用
     ```python
@@ -427,9 +519,9 @@ print(path.joinpath('sub_dir', 'file2.txt'))
     print(p_resolve.relative_to())
     # temp/file.txt
 
-### その他
+## 6.8. その他
 
-#### パスの同一判定：samefile
+### 6.8.1. パスの同一判定：samefile
 パスが参照するファイルが同一かどうかを判定。相対パスと絶対パスなどを判定する。この場合は`==`演算子では一致しない
 ```python
 print(p_file1)
@@ -441,7 +533,7 @@ print(p_file1.samefile(p_file2))
 print(p_file1 == p_file2)
 # False
 ```
-#### str型への変換
+### 6.8.2. str型への変換
 Path型のオブジェクトを`print`で出力すると文字列が表示されるが、あくまで型は`Path`で`str`ではない
 文字列に変換したい場合は`str()`を用いる。
 ```python
@@ -453,7 +545,7 @@ print(type(str(path)))
 ```
 なお、nameでファイル名を文字列で取得したりsuffix属性で拡張子を文字列で取得もできる。
 
-#### osモジュールとpathlibの対応
+### 6.8.3. osモジュールとpathlibの対応
 |処理内容|osおよびos.path|pathlib|
 |:--|:--|:--|
 |カレントディレクトリ取得|`os.getcwd()`|`Path.cwd()`|
@@ -470,46 +562,80 @@ print(type(str(path)))
 |親ディレクトリ取得|`os.path.dirname()`|`PurePath.parent`|
 |拡張子分割・取得|`os.path.splitext()`|`PurePath.suffix`
 
-## 変換
-### 大文字小文字
-#### 全ての文字を小文字に: lower
+# 7. 変換
+## 7.1. 大文字小文字
+### 7.1.1. 全ての文字を小文字に: lower
 `str.lower()`ですべての文字を小文字に変換する。
 ```python
 word = "Hello"
 print(word.lower())
 # hello
 ```
-#### 全ての文字を大文字に: upper
+### 7.1.2. 全ての文字を大文字に: upper
 `str.upper()`ですべての文字を大文字に変換する。
 ```python
 word = "Hello"
 print(word.upper())
 # HELLO
 ```
-#### 最初を大文字、他は小文字に：capitalize
+### 7.1.3. 最初を大文字、他は小文字に：capitalize
 `str.capitalize()`で先頭を大文字に、それ以降を小文字に変換できる。
 ```python
 word = "hello python"
 print(word.capitalize())
 # Hello python
 ```
-#### 単語ごとに最初を大文字に、他は小文字に：title
+### 7.1.4. 単語ごとに最初を大文字に、他は小文字に：title
 `str.title()`で文字列に含まれる単語ごとに最初の文字を大文字に、それ以外の文字を小文字に変換する。
 ```python
 word = "hello python"
 print(word.title())
 # Hello Python
 ```
-#### 大文字を小文字に、小文字を大文字に: swapcase
+### 7.1.5. 大文字を小文字に、小文字を大文字に: swapcase
 `str.swapcase()`で大文字を小文字に、小文字を大文字に変換する。
 ```python
 word = "Hello"
 print(word.swapcase())
 # hELLO
 ```
+# 8. 文字列操作
+## 8.1. 置換
+### 8.1.1. 文字列を指定して置換：replace
+`replace`メソッドを用いて文字列を置換できる。
+第一引数に置換もと文字列、第二引数に置換先文字列を指定する
+```python
+s = "one two one two one"
+print(s.replace(" ", "-"))
+# "one-two-one-two-one"
+```
+置換先を`""`(空文字)にすると削除される
+```python
+s = "one two one two one"
+print(s.replace(" ", ""))
+# "onetwoonetwoone"
+```
+* 最大置換回数を指定：count
+  `replace`はデフォルトだと該当箇所すべてを置換する。しかし第三引数`count`で最大置換回数を指定できる。
+  ```python
+  s = "one two one two one"
+  print(s.replace("one", "XXX"))
+  # XXX two XXX two XXX
+  print(s.replace("one", "XXX", 2))
+  # XXX two XXX two one
+  ```
+* 複数の文字列を置換
+  複数の文字列を同じ文字列に置換する場合は正規表現を使う（別述）
+  複数の文字列をそれぞれ別の文字列に置換するには以下のようにreplaceをつなげるといい
+  ```python
+  s = "one two one two one"
+  print(s.replace("one", "XXX").replace("two", "YYY"))
+  # XXX YYY XXX YYY XXX
+  ```
+  これは複数のreplaceを順番に呼んでいるだけなため、一つ目の置換の結果によっては意図していない置換が発生する場合がある。
 
-## 文字列からメソッドを実行
-### 関数を変数に代入：getattr
+# 9. 文字列からメソッドを実行
+## 9.1. 関数を変数に代入：getattr
 オブジェクト、もしくはモジュールから属性の値を返す。第一引数にオブジェクトもしくはモジュールの名前、第二引数には属性の名前を含む文字列の値を渡す。
 いかのUserクラスがあるとする。
 ```python
@@ -529,7 +655,7 @@ doSomething(user)
 # John did something.
 ```
 
-### 文字列から関数を呼び出す：locals, globals
+## 9.2. 文字列から関数を呼び出す：locals, globals
 組み込み関数の`locals`と`globals`を用いて文字列からメソッドを実行できる。これらの関数はソースコードの現在のシンボルテーブルを表すpython辞書を返す。
 このとき`locals`はローカル変数を含む辞書を返し、`globals`はローカル変数を含む辞書を返す。関数名も文字列の形式で返される。
 ```python
@@ -545,13 +671,13 @@ globals()['myFunc2']('minus')
 # This is minus function.
 ```
 
-## 可変長引数:*args, **kwargs
+# 10. 可変長引数:*args, **kwargs
 引数に`*`と`**`を付けることで、可変長引数を指定できる。この時変数名はargsやkwargsでなくてもいい（大事なのはアスタリスク）
 それぞれ以下の意味を持つ
 * `*args`:複数の引数をタプルで受け取る。
 * `**kwargs`:複数のキーワード引数を辞書で受け取る。
 
-### *args
+## 10.1. *args
 以下に例
 ```python
 def func_args(arg1, arg2, *args):
@@ -591,7 +717,7 @@ func_args2(0, 1, 2, 3, arg2=4)
 # args:  (1, 2, 3)
 ```
 
-### **kwargs
+## 10.2. **kwargs
 `**kwargs`のように`**`を付けた引数を定義すると任意の数のキーワード引数を指定できる。
 この時関数の中では引数名がキー`key`、値が`value`となる辞書として受け取られる。
 ```python
@@ -624,9 +750,195 @@ func_test(**d)
 # 3
 ```
 
-## pickle
+# ラムダ式: lambda
+lambdaで名前を持たない無名関数を作成することができる。
+sortやmax, minなどの引数にlambda式を使うことで、挙動を制御できたりする
+## def との対応
+defとの対応は以下の通り
+```python
+def 名前(引数1, 引数2, ...):
+  return 式
+
+名前 = lambda 引数1, 引数2, ... : 式
+```
+具体例は以下
+```python
+def add_def(a, b=1):
+  return a+b
+add_lambda = lambda a, b=1:a+b
+print(add_def(3,4))# 7
+print(add_def(3))# 4
+print(add_lambda(3,4))# 7
+print(add_lambda(3))# 4
+```
+## if文
+その形式上、lambdaでは1行での式しか使用することができない。ただ、if分に相当する三項演算子は使用可能
+```python
+get_odd_even = lambda x: 'even' if x % 2 == 0 else 'odd'
+print(get_odd_even(3))# odd
+print(get_odd_even(4))# even
+```
+## 名前について
+これまでの例では`名前= lambda`のようにlambda式に変数名を付けていたが、PEP8では名前を付けないことが推奨されている。
+つけると、コーディング規約の自動チェックツールではWarningが出たりする（Errorではないので実行はできる）
+
+# 日時について：datetime
+参考：[Pythonのdatetimeで日付や時間と文字列を変換（strftime, strptime） | note.nkmk.me](https://note.nkmk.me/python-datetime-usage/)
+datetimeモジュールを使うことで日時（日付や時間・時刻）の処理ができる。また文字列に変換したり文字列から返還することもできる。
+引き算や足し算も可能
+
+## datetimeオブジェクトと現在情報：now
+日付（年、月、日）と時刻（時、分、秒、マイクロ秒）を持つオブジェクト
+以下の情報を持つ
+|情報名|属性|
+|:--|:--|
+|年|`year`|
+|月|`month`|
+|日|`day`|
+|時|`hour`|
+|分|`minute`|
+|秒|`second`|
+|マイクロ秒|`microsecond`|
+
+コンストラクタは以下の通りで、任意の`datetime`オブジェクトを作成できる
+```python
+datetime(year, month, day, hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+import datetime
+dt = datetime.datetime(2022, 7, 21, 12, 15, 30, 2000)
+```
+`year`, `month`, `day`以外はデフォルト値があるので、引数として渡さなくても使用できる。
+また`datetime.now()`を使うことで今日の日付と現在時刻の`datetime`オブジェクトを取得できる。
+```python
+import datetime
+now = datetime.datetime.now()
+```
+### datetime ⇒ date
+`date()`で`datetime`オブジェクトを`date`オブジェクトに変換できる
+```python
+dt_now = datetime.datetime.now()
+print(dt_now)
+# 2022-07-14 12:31:13.12345
+print(type(dt_now))
+# <class 'datetime.datetime'>
+
+print(dt_now.date())
+# 2022-07-14
+print(type(dt_now.date()))
+# <class 'datetime.date>
+```
+
+## dateオブジェクトと現在日時：today
+`date`オブジェクトは以下の情報を持つ
+|情報名|属性|
+|:--|:--|
+|年|`year`|
+|月|`month`|
+|日|`day`|
+
+コンストラクタとオブジェクトの作成は以下の通り
+```python
+date(year, month, day)
+
+d = datetime.date(2022,7,11)
+```
+また`date.today()`を使うことで現在の日付を取得できる
+```python
+d_today = datetime.date.today()
+```
+
+## timeオブジェクト
+`time`オブジェクトは以下の情報を持つ。
+|情報名|属性|
+|:--|:--|
+|時|`hour`|
+|分|`minute`|
+|秒|`second`|
+|マイクロ秒|`microsecond`|
+
+コンストラクタとオブジェクトの作成は以下の通り
+```python
+time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
+
+t = datetime.time(12,15,30,2000)
+```
+
+## 経過日時や時間差：timedelta
+`timedelta`オブジェクトは二つの日時の時間差、経過時間を持つ。
+以下の情報を持つ
+|情報名|属性|
+|:--|:--|
+|日|`day`|
+|秒|`seconds`|
+|マイクロ秒|`microseconds`|
+
+### オブジェクトの作成
+1. datetime,dateオブジェクトの引き算
+  `datetime`オブジェクト同士を引き算`-`すると、`timedelta`オブジェクトを得られる。
+  ```python
+  dt_now = datetime.datetime.now() # 2018-02-02 18:31:13.271231
+  dt = datetime.datetime(2018, 2, 1, 12, 15, 30, 2000)
+  td = dt_now - dt
+  print(td) # 1 day, 18:31:13.271231
+  print(td.days) # 1
+  print(td.seconds) # 66673
+  print(td.microseconds) # 271231
+  print(td.total_seconds()) # 153073.271231
+2. コンストラクタ
+  引数としては`days`, `seconds`, `microseconds`, `milliseconds`, `minutes`, `hours`, `weeks`が存在し、すべてデフォルト値があるため省略可能。
+  `timedelta`オブジェクトが保持しているのはあくまでも日数`days`、秒数`seconds`、マイクロ秒数`microseconds`のみなので、`weeks=1`は`days=7`と等しくなる
+  ```python
+  timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+  ```
+
+### 引き算、足し算
+`timedelta`オブジェクトは`datetime`や`date`と引き算や足し算などの演算ができる。
+これによって、1週間後や10日後の日付や50分後の時刻などを取得できる。
+```python
+d_today = datetime.date.today() # 2018-02-02
+td_1w = datetime.timedelta(weeks=1) # 7 days, 0:00:00
+d_1w = d_today - td_1w # 2018-01-26
+dt_now = datetime.datetime.now() # 2018-02-02 18:31:13.271231
+td_10d = datetime.timedelta(days=10) # 10 days, 0:00:00
+dt_10d = dt_now + td_10d # 2018-02-12 18:31:13.271231
+td_50m = datetime.timedelta(minutes=50) # 0:50:00
+print(td_50m.seconds) # 3000
+dt_50m = dt_now + td_50m # 2018-02-02 19:21:13.271231
+```
+
+## 文字列に変換：strftime, 文字列から変換：strptime
+変換する際に文字列と属性を対応させる書式化コードを使用する。
+主なものをいかに挙げる。
+* `%d`:0埋めした10進数で表記した月中の日にち
+* `%m`:0埋めした10進数で表記した月
+* `%y`:0埋めした10進数で表記した西暦の下2桁
+* `%Y`:0埋めした10進数で表記した西暦4桁
+* `%H`:0埋めした10進数で表記した時（24時間表記）
+* `%I`:0埋めした10進数で表記した時（12時間表記）
+* `%M`:0埋めした10進数で表記した分
+* `%S`:0埋めした10進数で表記した秒
+* `%f`:0埋めした10進数で表記したマイクロ秒（6桁）
+* `%A`:ロケールの曜日名
+* `%a`:ロケールの曜日名（短縮形）
+* `%B`:ロケールの月名
+* `%b`:ロケールの月名（短縮形）
+* `%j` : 0埋めした10進数で表記した年中の日にち（正月が`'001'`）
+* `%U` : 0埋めした10進数で表記した年中の週番号 （週の始まりは日曜日）
+* `%W` : 0埋めした10進数で表記した年中の週番号 （週の始まりは月曜日）
+
+そのほかは以下を参考
+* [8.1. datetime --- 基本的な日付型および時間型 — Python 3.6.15 ドキュメント](https://docs.python.org/ja/3.6/library/datetime.html#strftime-and-strptime-behavior)
+### 文字列に変換：strftime
+`datetime`オブジェクト、`date`オブジェクトのP`strftime`日時の情報を任意の書式フォーマットの文字列に変換できる。
+```python
+dt_now = datetime.datetime.now() # 2018-02-02 18:31:13.271231
+print(dt_now.strftime('%Y-%m-%d %H:%M:%S'))
+# 2018-02-02 18:31:13
+print(dt_now.strftime('%y%m%d))
+# 180202
+```
+# 11. pickle
 オブジェクトの直列化（シリアライズ）とその復元（デシリアライズ）ができる。
-### pickle化対象
+## 11.1. pickle化対象
 pickle化できるものは以下のようになる。
 * None値、boolean値（True/False）
 * 整数値、浮動小数点数値、複素数値
@@ -636,9 +948,9 @@ pickle化できるものは以下のようになる。
 * __dict__属性の値がpickle化可能なクラスのインスタンス。または__getstate__メソッドの戻り値がpickle化可能なクラスのインスタンス
 
 これ以外のファイルオブジェクトなどはpickle化できない
-### シリアライズとデシリアライズ
+## 11.2. シリアライズとデシリアライズ
 pickle化には`dump`、非pickle化には`load`を使用する
-#### 通常オブジェクト
+### 11.2.1. 通常オブジェクト
 ```python
 favs = ['beer', 'sake']
 mydata = {'name':'田中', 'age':999,'weight':123.4,'favs':favs}
@@ -653,7 +965,7 @@ with open('pickled.pkl', 'rb') as f:
   favs2 = mydata2['favs']
 ```
 この時mydataとmydata2は値は同じ（mydata == mydata2 = True)だが、オブジェクトは同じではない（mydata is mydata2 = False）
-#### クラスのインスタンス
+### 11.2.2. クラスのインスタンス
 また、クラスのインスタンスもpickle化することができる
 ```python
 class Foo:
@@ -693,7 +1005,7 @@ with open('pickled.pkl', 'rb') as f:
   foo = pickle.load(f) # 復元できる
 print(foo.a) # AttributeError (復元したfooにはa属性がない)
 ```
-#### クラスや関数
+### 11.2.3. クラスや関数
 関数やクラス事態をpickle化することもできる
 ```python
 class Foo:
@@ -712,12 +1024,23 @@ with open('pickled.pkl', 'rb') as f:
   greet = pickle.load(f) # hello関数をgreet関数に復元
 ```
 ただし関数やクラスのコードそのものがpickle化されたのではなく、完全修飾された名前参照（それが定義されているモジュール名と関数名またはクラス名だけ）がpickle化されている。そのため関数やクラスを非pickle化するときはその関数やクラスを定義しているモジュールがインポートされている必要がある。
-### pickleと_pickle
+## 11.3. pickleと_pickle
 _pickleはC言語的に最適化されたもの？python2ではCPickleという名称だった
 基本的には使用可能な場合自動的に_pickleが適用される。そのため_pickleを直接インポートする必要がない。
+## deepcopyとの対応
+参考：[python - copy.deepcopy vs pickle - Stack Overflow](https://stackoverflow.com/questions/1410615/copy-deepcopy-vs-pickle)
+以下の二つは同じ挙動をする
+```python
+data = ["value1", "value2"]
 
-## その他組み込み関数
-### 型判定: isinstance
+import copy
+data_c = copy.deepcopy(data)
+
+import pickle
+data_p = pickle.loads(pickle.dumps(data,-1))
+```
+# 12. その他組み込み関数
+## 12.1. 型判定: isinstance
 1番目の引数に指定したオブジェクトが2番目の引数に指定したデータ型と等しいかどうかを返す
 ```python
 isinstance(object, classinfo)
