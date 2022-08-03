@@ -10,6 +10,9 @@
       - [1.2.1.3. ファクトリ・フィクスチャ](#1213-ファクトリフィクスチャ)
       - [1.2.1.4. パラメタライズド・フィクスチャ](#1214-パラメタライズドフィクスチャ)
     - [1.2.2. パラメータ化したテスト](#122-パラメータ化したテスト)
+    - [テストの検証](#テストの検証)
+      - [条件： assert](#条件-assert)
+      - [エラー： pytest.raises](#エラー-pytestraises)
   - [1.3. オプション](#13-オプション)
   - [1.4. mock, patch](#14-mock-patch)
     - [1.4.1. 基本](#141-基本)
@@ -153,7 +156,26 @@ def test_param(number, expected):
     assert is_prime(number) == expected
 ```
 parametrizeの第一引数で引数名を設定し、それぞれのパラメータを第二引数でlist(tuple)で設定する。
+### テストの検証
+####  条件： assert
+検証したい条件を`assert`で比較する。`if a == b`で`True`だとテストが通り、`False`だと通らないみたいな感じ
+```python
+def test1():
+    assert 1 + 2 == 3
+```
+#### エラー： pytest.raises
+`with pytest.raises(Exception)`でプログラム内でそのエラーが発生したかどうかを検証できる。`raises`の引数に起こってほしいエラーを記述する。
+また、以下のようにするとエラーメッセージのテストも可能
+```python
+def sum_values(a, b):
+    return a + b
 
+def test_error_sum():
+    with pytest.raises(Exception) as e:
+        _ = sum_values(1, 'moji')
+
+    assert str(e.value) == "unsupported operand type(s) for +: 'int' and 'str'"
+```
 ## 1.3. オプション
 pytestのオプションは以下の通り
 |オプション名|意味|概要|

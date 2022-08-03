@@ -10,6 +10,19 @@
 - [4. コマンドライン引数の制御](#4-コマンドライン引数の制御)
   - [4.1. sys.argv](#41-sysargv)
   - [4.2. argsparseモジュール](#42-argsparseモジュール)
+    - [4.2.1. 基本](#421-基本)
+    - [4.2.2. ヘルプの作り方](#422-ヘルプの作り方)
+    - [4.2.3. 引数の設定](#423-引数の設定)
+      - [4.2.3.1. 基本](#4231-基本)
+        - [4.2.3.1.1. 必須引数](#42311-必須引数)
+        - [4.2.3.1.2. オプション引数](#42312-オプション引数)
+      - [4.2.3.2. 応用](#4232-応用)
+        - [4.2.3.2.1. デフォルト値](#42321-デフォルト値)
+        - [4.2.3.2.2. 型指定](#42322-型指定)
+        - [4.2.3.2.3. フラグ](#42323-フラグ)
+        - [4.2.3.2.4. 選択](#42324-選択)
+        - [4.2.3.2.5. 複数個の受け取り](#42325-複数個の受け取り)
+        - [4.2.3.2.6. 必須のオプション](#42326-必須のオプション)
 - [5. ディレクトリ関係](#5-ディレクトリ関係)
   - [5.1. 親ディレクトリのモジュールインポート](#51-親ディレクトリのモジュールインポート)
     - [5.1.1. パッケージ内で別ディレクトリから](#511-パッケージ内で別ディレクトリから)
@@ -52,30 +65,30 @@
 - [10. 可変長引数:*args, **kwargs](#10-可変長引数args-kwargs)
   - [10.1. *args](#101-args)
   - [10.2. **kwargs](#102-kwargs)
-- [ラムダ式: lambda](#ラムダ式-lambda)
-  - [def との対応](#def-との対応)
-  - [if文](#if文)
-  - [名前について](#名前について)
-- [日時について：datetime](#日時についてdatetime)
-  - [datetimeオブジェクトと現在情報：now](#datetimeオブジェクトと現在情報now)
-    - [datetime ⇒ date](#datetime--date)
-  - [dateオブジェクトと現在日時：today](#dateオブジェクトと現在日時today)
-  - [timeオブジェクト](#timeオブジェクト)
-  - [経過日時や時間差：timedelta](#経過日時や時間差timedelta)
-    - [オブジェクトの作成](#オブジェクトの作成)
-    - [引き算、足し算](#引き算足し算)
-  - [文字列に変換：strftime, 文字列から変換：strptime](#文字列に変換strftime-文字列から変換strptime)
-    - [文字列に変換：strftime](#文字列に変換strftime)
-- [11. pickle](#11-pickle)
-  - [11.1. pickle化対象](#111-pickle化対象)
-  - [11.2. シリアライズとデシリアライズ](#112-シリアライズとデシリアライズ)
-    - [11.2.1. 通常オブジェクト](#1121-通常オブジェクト)
-    - [11.2.2. クラスのインスタンス](#1122-クラスのインスタンス)
-    - [11.2.3. クラスや関数](#1123-クラスや関数)
-  - [11.3. pickleと_pickle](#113-pickleと_pickle)
-  - [deepcopyとの対応](#deepcopyとの対応)
-- [12. その他組み込み関数](#12-その他組み込み関数)
-  - [12.1. 型判定: isinstance](#121-型判定-isinstance)
+- [11. ラムダ式: lambda](#11-ラムダ式-lambda)
+  - [11.1. def との対応](#111-def-との対応)
+  - [11.2. if文](#112-if文)
+  - [11.3. 名前について](#113-名前について)
+- [12. 日時について：datetime](#12-日時についてdatetime)
+  - [12.1. datetimeオブジェクトと現在情報：now](#121-datetimeオブジェクトと現在情報now)
+    - [12.1.1. datetime ⇒ date](#1211-datetime--date)
+  - [12.2. dateオブジェクトと現在日時：today](#122-dateオブジェクトと現在日時today)
+  - [12.3. timeオブジェクト](#123-timeオブジェクト)
+  - [12.4. 経過日時や時間差：timedelta](#124-経過日時や時間差timedelta)
+    - [12.4.1. オブジェクトの作成](#1241-オブジェクトの作成)
+    - [12.4.2. 引き算、足し算](#1242-引き算足し算)
+  - [12.5. 文字列に変換：strftime, 文字列から変換：strptime](#125-文字列に変換strftime-文字列から変換strptime)
+    - [12.5.1. 文字列に変換：strftime](#1251-文字列に変換strftime)
+- [13. pickle](#13-pickle)
+  - [13.1. pickle化対象](#131-pickle化対象)
+  - [13.2. シリアライズとデシリアライズ](#132-シリアライズとデシリアライズ)
+    - [13.2.1. 通常オブジェクト](#1321-通常オブジェクト)
+    - [13.2.2. クラスのインスタンス](#1322-クラスのインスタンス)
+    - [13.2.3. クラスや関数](#1323-クラスや関数)
+  - [13.3. pickleと_pickle](#133-pickleと_pickle)
+  - [13.4. deepcopyとの対応](#134-deepcopyとの対応)
+- [14. その他組み込み関数](#14-その他組み込み関数)
+  - [14.1. 型判定: isinstance](#141-型判定-isinstance)
 
 # 1. 正規表現
 ## 1.1. 正規表現での文字列抽出(re.search, re.findall)
@@ -206,7 +219,9 @@ print(sys.argv[2]) # sample2
 ```
 
 ## 4.2. argsparseモジュール
-
+参考：[ArgumentParserの使い方を簡単にまとめた - Qiita](https://qiita.com/kzkadc/items/e4fc7bc9c003de1eb6d0#%E5%9F%BA%E6%9C%AC%E5%BD%A2)
+公式ドキュメント：[16.4. argparse --- コマンドラインオプション、引数、サブコマンドのパーサー — Python 3.6.15 ドキュメント](https://docs.python.org/ja/3.6/library/argparse.html)
+### 4.2.1. 基本
 必要な流れは以下
 1. argsparseモジュールをインポート
 2. argsparse.ArgumentParserクラスのインスタンス作成
@@ -226,21 +241,105 @@ result = args.x + args.y  # 戻り値に格納された値を使用
 
 print(result)
 ```
+使用する際は例の`args.x`のように、コマンドライン引数の解析の変数に引数名でアクセスする。
 
+### 4.2.2. ヘルプの作り方
+通常のコマンドと同じように`python {プログラム名} -h`でコマンドライン引数のヘルプを表示できる。
+ヘルプに追加できるのは、プログラムの説明と、それぞれの引数の説明。プログラムの説明はparserを作成するときに引数として渡し、引数の説明はそれぞれの解析方法を追加するときに引数として`help`を渡す。
+以下に例
 ```python
-parser = argparse.ArgumentParser(description="test")
-parser.add_argument("x",type=int,help="an integer to be added") # 基本の形
-parser.add_argument("-y",type=int,default=0) # --option value形式
-parser.add_argument("-s","--switch",action="store_true") # --option 形式のフラグ、スイッチ
-args.parser.parse_args()
+# test.py
+import argparse
+parser = argparse.ArgumentParser(description='これはプログラムの説明です。')
 
-result = args.x+args.y
+parser.add_argument('arg1', help='一つ目の引数')
+parser.add_argument('arg2')
+parser.add_argument('--arg3')
+parser.add_argument('--arg4', help='オプション引数です')
 
-if args.switch:
-    print("result: "+str(result)+" and switch on")
-else:
-    print("result: "+str(result)+" and switch off")
+args = parser.parse_args()
 ```
+これを`python test.py -h`で実行すると以下が表示される。
+```
+$ python test.py -h
+usage: arg_test.py [-h] [--arg3 ARG3] [--arg4 ARG4] arg1 arg2
+
+これはプログラムの説明です。
+
+positional arguments:
+  arg1         一つ目の引数
+  arg2
+
+optional arguments:
+  -h, --help   show this help message and exit
+  --arg3 ARG3
+  --arg4 ARG4  オプション引数です
+```
+
+### 4.2.3. 引数の設定
+#### 4.2.3.1. 基本
+##### 4.2.3.1.1. 必須引数
+`add_argument`で引数名を`args`のように通常の文字列にすると必須引数になる。
+この引数を指定し忘れるとエラーになる。
+##### 4.2.3.1.2. オプション引数
+`add_argument`で引数名を`--args`のようにハイフン('`-`')を1～2個つけるとオプション引数として登録される。
+この場合、引数を指定しなくてもエラーは発生しない。この時、その値は`None`になる。また指定する順番も自由
+また、正式名称と略称をそれぞれ以下のように設定することができる。
+```python
+parser.add_argument('-i','--input')
+```
+実行の際は`-i`でも`--input`でも指定できるが、プログラム内で取得する際は正式名称(`input`)でしか取得できない。
+#### 4.2.3.2. 応用
+##### 4.2.3.2.1. デフォルト値
+オプションでは指定されない場合は`None`となるが、以下のようにしてデフォルト値を設定することが可能
+```python
+parser.add_argument('--message', default='hello!')
+```
+
+##### 4.2.3.2.2. 型指定
+コマンドライン引数で指定された値はデフォルトでは文字列型。以下のように指定することができる
+```python
+parser.add_argument('--number', type=int)
+```
+これは`type`に指定された型じゃないとエラーが出るんじゃなくて、`type`に渡されたもので変換する、といった処理なので、この`type`に好きなメソッドなどをわたすことでいろいろできる。
+ピリオド(`'.'`)区切りの数値をリストで受け取る例
+```python
+tp = lambda x:list(map(int, x.split('.')))
+parser.add_argument('--addres', type=tp, help='IP Adress')
+```
+
+##### 4.2.3.2.3. フラグ
+`add_argument`に`action`を指定するとフラグになる
+```python
+parser.add_argument('--flg', action='store_true')
+```
+この時、実行時に`--flg`が指定されていると`True`、指定されていないと`False`になる。
+また`store_true`ではなく`store_false`にすると挙動が逆になり、実行時に`--flg`が指定されていると`False`、されていないと`True`になる。
+
+##### 4.2.3.2.4. 選択
+`add_argument`で`choices`を指定すると、`choices`に渡した値の中にあるもののみに限定でき、それ以外を指定するとエラーになる。
+また選択肢は`--help`で確認できる
+```python
+parser.add_argument('--fruit', choices=['apple','orange','banana'])
+```
+
+##### 4.2.3.2.5. 複数個の受け取り
+`nargs='*'`を指定することで、可変長で複数個をリストで受け取ることができる。また`'*'`の代わりに整数を指定すると、固定長にもできる。
+```python
+parser.add_argument('--colors',nargs='*')
+args = parser.parse_args()
+print(args.colors)
+```
+```cmd
+$ python test.py --colors red green blue
+['red', 'green', 'blue']
+```
+##### 4.2.3.2.6. 必須のオプション
+`required=True`を指定することで、オプション引数を必須にすることができる。
+```python
+parser.add_argument('-a',required=True)`
+```
+
 # 5. ディレクトリ関係
 ## 5.1. 親ディレクトリのモジュールインポート
 参考：[Pythonの相対インポートで上位ディレクトリ・サブディレクトリを指定 | note.nkmk.me](https://note.nkmk.me/python-relative-import/)
@@ -750,10 +849,10 @@ func_test(**d)
 # 3
 ```
 
-# ラムダ式: lambda
+# 11. ラムダ式: lambda
 lambdaで名前を持たない無名関数を作成することができる。
 sortやmax, minなどの引数にlambda式を使うことで、挙動を制御できたりする
-## def との対応
+## 11.1. def との対応
 defとの対応は以下の通り
 ```python
 def 名前(引数1, 引数2, ...):
@@ -771,23 +870,23 @@ print(add_def(3))# 4
 print(add_lambda(3,4))# 7
 print(add_lambda(3))# 4
 ```
-## if文
+## 11.2. if文
 その形式上、lambdaでは1行での式しか使用することができない。ただ、if分に相当する三項演算子は使用可能
 ```python
 get_odd_even = lambda x: 'even' if x % 2 == 0 else 'odd'
 print(get_odd_even(3))# odd
 print(get_odd_even(4))# even
 ```
-## 名前について
+## 11.3. 名前について
 これまでの例では`名前= lambda`のようにlambda式に変数名を付けていたが、PEP8では名前を付けないことが推奨されている。
 つけると、コーディング規約の自動チェックツールではWarningが出たりする（Errorではないので実行はできる）
 
-# 日時について：datetime
+# 12. 日時について：datetime
 参考：[Pythonのdatetimeで日付や時間と文字列を変換（strftime, strptime） | note.nkmk.me](https://note.nkmk.me/python-datetime-usage/)
 datetimeモジュールを使うことで日時（日付や時間・時刻）の処理ができる。また文字列に変換したり文字列から返還することもできる。
 引き算や足し算も可能
 
-## datetimeオブジェクトと現在情報：now
+## 12.1. datetimeオブジェクトと現在情報：now
 日付（年、月、日）と時刻（時、分、秒、マイクロ秒）を持つオブジェクト
 以下の情報を持つ
 |情報名|属性|
@@ -812,7 +911,7 @@ dt = datetime.datetime(2022, 7, 21, 12, 15, 30, 2000)
 import datetime
 now = datetime.datetime.now()
 ```
-### datetime ⇒ date
+### 12.1.1. datetime ⇒ date
 `date()`で`datetime`オブジェクトを`date`オブジェクトに変換できる
 ```python
 dt_now = datetime.datetime.now()
@@ -827,7 +926,7 @@ print(type(dt_now.date()))
 # <class 'datetime.date>
 ```
 
-## dateオブジェクトと現在日時：today
+## 12.2. dateオブジェクトと現在日時：today
 `date`オブジェクトは以下の情報を持つ
 |情報名|属性|
 |:--|:--|
@@ -846,7 +945,7 @@ d = datetime.date(2022,7,11)
 d_today = datetime.date.today()
 ```
 
-## timeオブジェクト
+## 12.3. timeオブジェクト
 `time`オブジェクトは以下の情報を持つ。
 |情報名|属性|
 |:--|:--|
@@ -862,7 +961,7 @@ time(hour=0, minute=0, second=0, microsecond=0, tzinfo=None)
 t = datetime.time(12,15,30,2000)
 ```
 
-## 経過日時や時間差：timedelta
+## 12.4. 経過日時や時間差：timedelta
 `timedelta`オブジェクトは二つの日時の時間差、経過時間を持つ。
 以下の情報を持つ
 |情報名|属性|
@@ -871,7 +970,7 @@ t = datetime.time(12,15,30,2000)
 |秒|`seconds`|
 |マイクロ秒|`microseconds`|
 
-### オブジェクトの作成
+### 12.4.1. オブジェクトの作成
 1. datetime,dateオブジェクトの引き算
   `datetime`オブジェクト同士を引き算`-`すると、`timedelta`オブジェクトを得られる。
   ```python
@@ -890,7 +989,7 @@ t = datetime.time(12,15,30,2000)
   timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
   ```
 
-### 引き算、足し算
+### 12.4.2. 引き算、足し算
 `timedelta`オブジェクトは`datetime`や`date`と引き算や足し算などの演算ができる。
 これによって、1週間後や10日後の日付や50分後の時刻などを取得できる。
 ```python
@@ -905,7 +1004,7 @@ print(td_50m.seconds) # 3000
 dt_50m = dt_now + td_50m # 2018-02-02 19:21:13.271231
 ```
 
-## 文字列に変換：strftime, 文字列から変換：strptime
+## 12.5. 文字列に変換：strftime, 文字列から変換：strptime
 変換する際に文字列と属性を対応させる書式化コードを使用する。
 主なものをいかに挙げる。
 * `%d`:0埋めした10進数で表記した月中の日にち
@@ -927,7 +1026,7 @@ dt_50m = dt_now + td_50m # 2018-02-02 19:21:13.271231
 
 そのほかは以下を参考
 * [8.1. datetime --- 基本的な日付型および時間型 — Python 3.6.15 ドキュメント](https://docs.python.org/ja/3.6/library/datetime.html#strftime-and-strptime-behavior)
-### 文字列に変換：strftime
+### 12.5.1. 文字列に変換：strftime
 `datetime`オブジェクト、`date`オブジェクトのP`strftime`日時の情報を任意の書式フォーマットの文字列に変換できる。
 ```python
 dt_now = datetime.datetime.now() # 2018-02-02 18:31:13.271231
@@ -936,9 +1035,9 @@ print(dt_now.strftime('%Y-%m-%d %H:%M:%S'))
 print(dt_now.strftime('%y%m%d))
 # 180202
 ```
-# 11. pickle
+# 13. pickle
 オブジェクトの直列化（シリアライズ）とその復元（デシリアライズ）ができる。
-## 11.1. pickle化対象
+## 13.1. pickle化対象
 pickle化できるものは以下のようになる。
 * None値、boolean値（True/False）
 * 整数値、浮動小数点数値、複素数値
@@ -948,9 +1047,9 @@ pickle化できるものは以下のようになる。
 * __dict__属性の値がpickle化可能なクラスのインスタンス。または__getstate__メソッドの戻り値がpickle化可能なクラスのインスタンス
 
 これ以外のファイルオブジェクトなどはpickle化できない
-## 11.2. シリアライズとデシリアライズ
+## 13.2. シリアライズとデシリアライズ
 pickle化には`dump`、非pickle化には`load`を使用する
-### 11.2.1. 通常オブジェクト
+### 13.2.1. 通常オブジェクト
 ```python
 favs = ['beer', 'sake']
 mydata = {'name':'田中', 'age':999,'weight':123.4,'favs':favs}
@@ -965,7 +1064,7 @@ with open('pickled.pkl', 'rb') as f:
   favs2 = mydata2['favs']
 ```
 この時mydataとmydata2は値は同じ（mydata == mydata2 = True)だが、オブジェクトは同じではない（mydata is mydata2 = False）
-### 11.2.2. クラスのインスタンス
+### 13.2.2. クラスのインスタンス
 また、クラスのインスタンスもpickle化することができる
 ```python
 class Foo:
@@ -1005,7 +1104,7 @@ with open('pickled.pkl', 'rb') as f:
   foo = pickle.load(f) # 復元できる
 print(foo.a) # AttributeError (復元したfooにはa属性がない)
 ```
-### 11.2.3. クラスや関数
+### 13.2.3. クラスや関数
 関数やクラス事態をpickle化することもできる
 ```python
 class Foo:
@@ -1024,10 +1123,10 @@ with open('pickled.pkl', 'rb') as f:
   greet = pickle.load(f) # hello関数をgreet関数に復元
 ```
 ただし関数やクラスのコードそのものがpickle化されたのではなく、完全修飾された名前参照（それが定義されているモジュール名と関数名またはクラス名だけ）がpickle化されている。そのため関数やクラスを非pickle化するときはその関数やクラスを定義しているモジュールがインポートされている必要がある。
-## 11.3. pickleと_pickle
+## 13.3. pickleと_pickle
 _pickleはC言語的に最適化されたもの？python2ではCPickleという名称だった
 基本的には使用可能な場合自動的に_pickleが適用される。そのため_pickleを直接インポートする必要がない。
-## deepcopyとの対応
+## 13.4. deepcopyとの対応
 参考：[python - copy.deepcopy vs pickle - Stack Overflow](https://stackoverflow.com/questions/1410615/copy-deepcopy-vs-pickle)
 以下の二つは同じ挙動をする
 ```python
@@ -1039,8 +1138,8 @@ data_c = copy.deepcopy(data)
 import pickle
 data_p = pickle.loads(pickle.dumps(data,-1))
 ```
-# 12. その他組み込み関数
-## 12.1. 型判定: isinstance
+# 14. その他組み込み関数
+## 14.1. 型判定: isinstance
 1番目の引数に指定したオブジェクトが2番目の引数に指定したデータ型と等しいかどうかを返す
 ```python
 isinstance(object, classinfo)

@@ -55,3 +55,38 @@ docker-compose down --rmi all --volumes --remove-orphans
 $ docker inspect {コンテナidやname} | grep 'LopPath'
 ```
 このパスの先のファイルの閲覧をしようとすると権限がないといわれることがあるので、その時はsudoなどを使用する。
+
+### コンテナの状態を監視
+`docker stats`で調べることができる。
+```
+$ docker stats
+CONTAINER ID        NAME                     CPU %           MEM USAGE / LIMIT       MEM %       NET I/O             BLOCK I/O           PIDS
+0d173431ff71        concourse-worker_1       14.37%          32.16MiB / 1.943GiB     1.62%       53.4MB / 86.6MB     0B / 0B             22
+91e1a99d4d30        concourse-web_1          24.25%          32.19MiB / 1.943GiB     1.62%       356MB / 318MB       0B / 0B             13
+189cc19df954        concourse-db_1           0.82%           49.21MiB / 1.943GiB     2.47%       249MB / 230MB       0B / 0B             24
+47590fe69e09        sonarqube-db_1           0.00%           6.246MiB / 1.943GiB     0.31%       6.57kB / 1.22kB     0B / 0B             7
+```
+コマンドを実行すると上のように表示され、リアルタイムで更新される。
+`ctrl + c`などで終了できる。
+
+各項目の意味は以下
+|項目|意味|
+|:--|:--|
+|CONTAINER ID|コンテナのID|
+|NAME|コンテナの名前|
+|CPU %|コンテナが使用しているCPU使用率
+|MEM USAGE/LIMIT|使用しているメモリ/Dockerに許可されたメモリ（Docker > Setting > Resource）|
+|MEM %|コンテナが使用しているメモリ使用率|
+|NET I/O|コンテナが送受信したデータ量|
+|BLOCK I/O|コンテナがブロックデバイスに読み書きしたデータ量|
+|PID|プロセスID|
+#### オプション
+* 起動中の全コンテナ表示: -a, --all
+* フォーマットして表示： --format
+    `docker stats --format "{{.Name}} : {{.MemUsage}}"`みたいにフォーマットを指定できる
+    `.Container`, `.Name`, `.ID`, `.CPUPerc`, `.MemUsage`, `.NetIO`, `BlockIO`, `.MemPerc`, `.PIDs`を選択できる
+    参考：[docker stats | Docker Documentation](https://docs.docker.com/engine/reference/commandline/stats/#formatting)
+* 一度だけ表示： --no-stream
+    通常はリアルタイムで更新するのをオフにする
+* 切り捨て表示しない： --no-trunc
+    コンテナIDを切り捨てせずに全表示
