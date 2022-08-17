@@ -87,6 +87,7 @@
     - [13.2.3. クラスや関数](#1323-クラスや関数)
   - [13.3. pickleと_pickle](#133-pickleと_pickle)
   - [13.4. deepcopyとの対応](#134-deepcopyとの対応)
+- [名前でアクセスできるtuple: namedtuple](#名前でアクセスできるtuple-namedtuple)
 - [14. その他組み込み関数](#14-その他組み込み関数)
   - [14.1. 型判定: isinstance](#141-型判定-isinstance)
 
@@ -1137,6 +1138,29 @@ data_c = copy.deepcopy(data)
 
 import pickle
 data_p = pickle.loads(pickle.dumps(data,-1))
+```
+
+# 名前でアクセスできるtuple: namedtuple
+参考：[namedtupleで美しいpythonを書く！（翻訳） - Qiita](https://qiita.com/Seny/items/add4d03876f505442136)
+通常のtupleは以下のように使う
+```python
+a = (1,'hello', objet())
+print(a[1])
+```
+しかし以下の問題点がある
+* 格納したデータに整数のインデックスでしかアクセスできない。
+* tupleの構造が毎回変わる（同じ数のフィールドとプロパティを持つ保証はない）
+namedtupleはこれらの問題を解決する。また従来のtupleと同じくイミュータブル（一度格納すると変更できない）である。
+
+`namedtuple`は以下のように使用する
+```python
+from collections import namedtuple # インポート
+Car = namedtuple('Car', ['color', 'mileage']) # 定義
+# 第二引数はnamedtuple('Car', 'color mileage')のように空白区切りの文字列でもいい
+my_car = Car('red',3812.4)
+# もしくはmy_car=Car(color='red', mileage=3812.4)
+print(mycar.color)
+print(mycar.mileage)
 ```
 # 14. その他組み込み関数
 ## 14.1. 型判定: isinstance
