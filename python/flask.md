@@ -37,3 +37,33 @@ def get_data():
 ```
 
 これでjavascriptからpythonのflaskに対して任意にデータを送ることができる。
+
+## requestについて
+requestオブジェクトから取得できるパラメータやメソッド、パスは以下の通り
+* メソッド・パス情報
+    `request.method`:GETやPOSTなどのメソッド
+    `request.url`: URL(http://localhost/test?q=1)
+    `request.host_url`: ホストURL(http://localhost)
+    `request.scheme`: スキーマ(http)
+    `request.host`: ホスト(localhost)
+    `request.path`: パス名(test)
+    `request.query_string`: クエリ文字列(q=1)
+
+* リクエストパラメータ
+    `request.args`: クエリ部分を辞書型で取得({"q":"1"})
+    `request.form`: formのデータを辞書型で取得
+    `request.get_json()`, `request.json`:リクエストボディ。送信時`Content-Type:application/json`での送信が必須
+
+* その他
+    `request.accept_charsets`: 受付可能なキャラクタセット
+    `request.accept_encoding`: 受付可能なエンコーディング
+    `request.accept_languages`: 受付可能な言語
+    `request.accept_mimetypes`: 受付可能なMIMEタイプ
+    `request.remote_addr`: リモートアドレス
+    `request.remote_user`: リモートユーザー
+    `request.date`: 日時
+    `request.content_type`: コンテントタイプ
+    `request.referrer`: 遷移元URL
+    `request.get_data()`: ボディ（バイナリ）
+    `request.headers`: ヘッダ（辞書型）
+    `request.environ`: 環境変数
