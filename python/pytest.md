@@ -322,7 +322,7 @@ def func_main():
 ```python
 def test_func_main(mocker):
     # 一部書き換え
-    mocker.patch(dict("main.d", {"c": 40}))
+    mocker.patchdict("main.d", {"c": 40}))
     main.func_main() # {"a": 10, "b": 20, "c": 40}
 
     # 既存データをすべて書き換え
