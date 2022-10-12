@@ -146,6 +146,14 @@ $ git checkout [ブランチ名]
   ```
   $ git rebase develop
   ```
+## push
+ローカルの変更をリモートに適応する
+以下のようなパターン
+|コマンド|概要|
+|:--|:--|
+|`git push {push先リポジトリ} {push対象ブランチ名}`|対象ローカルブランチを、指定したリポジトリにプッシュする。clone元に対してプッシュするときはpush先リポジトリを`origin`にする|
+|`git push -d {push先リポジトリ} {push対象ブランチ名}`|対象リモートブランチを削除|
+|`git push -f`|強制プッシュ|
 
 ## 1.4. fork
 ### 1.4.1. フォーク元の変更を反映する
@@ -171,3 +179,23 @@ $ git checkout [ブランチ名]
 ```cmd
 $ git fetch [remote]
 ```
+
+
+## プルリクエスト
+### プルリクエストをローカルにチェックアウト
+基本は以下のコマンド
+```
+$ git fetch origin pull/{ID}/head:{branch name}
+```
+`release`に`develop`のプルリクエスト（#11)を送った場合は、`git fetch origin pull/11/head:develop`になる
+`main_repo:release`に`sub_repo:develop`のプルリクエスト(#21)を送った場合は、`git fetch origin pull/11/head/develop`になる
+その後、通常通りブランチを`checkout`などで変更する
+
+リモートのブランチのプルリクエストをfetchする際は、以下のように.git/configに追記する
+参考：https://www.web-dev-qa-db-ja.com/ja/git/github%E3%81%AE%E3%83%97%E3%83%AB%E3%83%AA%E3%82%AF%E3%82%A8%E3%82%B9%E3%83%88%E3%82%92%E3%83%81%E3%82%A7%E3%83%83%E3%82%AF%E3%82%A2%E3%82%A6%E3%83%88%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95/1050174470/
+```
+[remote "remote_repo"]
+  ...
+  fetch = +refs/pull/*/head:refs/remotes/remote_repo/pr/*
+```
+この状態で`git fetch remote_repo`を実行すると、全てのプルリクエストが取得できる
