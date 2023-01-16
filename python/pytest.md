@@ -1,39 +1,44 @@
-# 1. pytest
-- [1. pytest](#1-pytest)
-  - [1.1. ディレクトリ構造](#11-ディレクトリ構造)
-  - [1.2. テストの設定](#12-テストの設定)
-    - [1.2.1. fixture](#121-fixture)
-      - [1.2.1.1. スコープ](#1211-スコープ)
-      - [1.2.1.2. 終了処理](#1212-終了処理)
-        - [1.2.1.2.1. yieldを使うパターン](#12121-yieldを使うパターン)
-        - [1.2.1.2.2. addfinalizerを使うパターン](#12122-addfinalizerを使うパターン)
-      - [1.2.1.3. ファクトリ・フィクスチャ](#1213-ファクトリフィクスチャ)
-      - [1.2.1.4. パラメタライズド・フィクスチャ](#1214-パラメタライズドフィクスチャ)
-    - [1.2.2. パラメータ化したテスト](#122-パラメータ化したテスト)
-    - [テストの検証](#テストの検証)
-      - [条件： assert](#条件-assert)
-      - [エラー： pytest.raises](#エラー-pytestraises)
-  - [1.3. オプション](#13-オプション)
-  - [1.4. mock, patch](#14-mock-patch)
-    - [1.4.1. 基本](#141-基本)
-    - [1.4.2. 名前空間の注意](#142-名前空間の注意)
-    - [1.4.3. 置き換え](#143-置き換え)
-      - [1.4.3.1. メソッド・クラス](#1431-メソッドクラス)
-      - [1.4.3.2. 辞書・環境変数](#1432-辞書環境変数)
-      - [1.4.3.3. datetime](#1433-datetime)
-      - [1.4.3.4. requestsライブラリ](#1434-requestsライブラリ)
-    - [1.4.4. mockの実行結果の検証](#144-mockの実行結果の検証)
-      - [1.4.4.1. 実行回数](#1441-実行回数)
-      - [1.4.4.2. 引数](#1442-引数)
+
+- [1. ディレクトリ構造](#1-ディレクトリ構造)
+- [2. テストの設定](#2-テストの設定)
+  - [2.1. fixture](#21-fixture)
+    - [2.1.1. スコープ](#211-スコープ)
+    - [自動実行](#自動実行)
+    - [2.1.2. 終了処理](#212-終了処理)
+      - [2.1.2.1. yieldを使うパターン](#2121-yieldを使うパターン)
+      - [2.1.2.2. addfinalizerを使うパターン](#2122-addfinalizerを使うパターン)
+    - [2.1.3. ファクトリ・フィクスチャ](#213-ファクトリフィクスチャ)
+    - [2.1.4. パラメタライズド・フィクスチャ](#214-パラメタライズドフィクスチャ)
+  - [2.2. パラメータ化したテスト](#22-パラメータ化したテスト)
+  - [2.3. テストの検証](#23-テストの検証)
+    - [2.3.1. 条件： assert](#231-条件-assert)
+    - [2.3.2. エラー： pytest.raises](#232-エラー-pytestraises)
+- [3. オプション](#3-オプション)
+- [4. 実行](#4-実行)
+  - [4.1. テスト指定](#41-テスト指定)
+  - [4.2. カバレッジ](#42-カバレッジ)
+    - [4.2.1. カバレッジの出力](#421-カバレッジの出力)
+- [5. mock, patch](#5-mock-patch)
+  - [5.1. 基本](#51-基本)
+  - [5.2. 名前空間の注意](#52-名前空間の注意)
+  - [5.3. 置き換え](#53-置き換え)
+    - [5.3.1. メソッド・クラス](#531-メソッドクラス)
+    - [5.3.2. 辞書・環境変数](#532-辞書環境変数)
+    - [5.3.3. datetime](#533-datetime)
+    - [5.3.4. requestsライブラリ](#534-requestsライブラリ)
+  - [5.4. mockの実行結果の検証](#54-mockの実行結果の検証)
+    - [5.4.1. 実行回数](#541-実行回数)
+    - [5.4.2. 引数](#542-引数)
+  - [5.5. 使用されたかのみ確認: spy](#55-使用されたかのみ確認-spy)
 
 ---
-## 1.1. ディレクトリ構造
+# 1. ディレクトリ構造
 テストは`test_`で始まるpythonファイルに記述する
 複数ファイルにテストを分ける際は、`tests`ディレクトリに全テストを格納し、`__init__.py`ファイルも作成する
 
-## 1.2. テストの設定
+# 2. テストの設定
 conftest.pyにテストの設定やfixtureなどを記述する
-### 1.2.1. fixture
+## 2.1. fixture
 テストの前処理（DBの登録など）を行うもの
 実行するテストの引数にそのフィクスチャ名を記述しているとそのテストの事項前にfixtureが実行される。
 fixtureで返り値を設定していれば、テストメソッドでその返り値を使用することもできる
@@ -67,7 +72,7 @@ def test_one(register_db, create_data):
 
 また、fixtureはconftest.pyで定義している場合テスト内で共有できる
 インポートなしでconftest.pyで定義したfixtureを他のテストpythonプログラムで呼び出すことができる。
-#### 1.2.1.1. スコープ
+### 2.1.1. スコープ
 スコープを設定することでそれぞれのfixtureの実行粒度を制御できる。
 スコープの種類は以下の４つ。
 |スコープ名|実行粒度|
@@ -83,9 +88,15 @@ def test_one(register_db, create_data):
 def fixture_method():
     # 処理
 ```
-
-#### 1.2.1.2. 終了処理
-##### 1.2.1.2.1. yieldを使うパターン
+### 自動実行
+`autouse`を`True`にすることで、関数を引数やデコレータで指定しなくても自動で実行されるfixtureを作成できる。
+```python
+@pytest.fuxture(scope="module", autouse=True)
+def fixture_method():
+    # 処理
+```
+### 2.1.2. 終了処理
+#### 2.1.2.1. yieldを使うパターン
 `yield`を使用することで、テスト終了後の処理を定義できる。
 ```python
 @pytest.fixture()
@@ -100,7 +111,7 @@ def test_db(db):
 この場合、1⇒3⇒2の順に処理される。
 この2の処理はテストの成否や例外の有無に関係なく実行されるため、フィクスチャ内での例外キャッチ等のエラーハンドリングは必要ない（フィクスチャ内での例外は別）
 また、function以外のスコープでは、そのフィクスチャを使うテストがすべて実行されてから終了処理が実行される。
-##### 1.2.1.2.2. addfinalizerを使うパターン
+#### 2.1.2.2. addfinalizerを使うパターン
 yieldと比較して特徴は以下の３つ
 * 終了処理をコールバック関数として登録
 * コールバック関数は複数登録できる
@@ -124,7 +135,7 @@ def test_one(clients):
 ```
 これを実行すると、clientsで設定して分3回の出力が起きる。
 
-#### 1.2.1.3. ファクトリ・フィクスチャ
+### 2.1.3. ファクトリ・フィクスチャ
 基本fixtureは固定的なデータを返すものだが、動的なものを返すものが欲しい時がある。
 その際はデータを生成するための関数（ファクトリ）を返す方法がある。
 ```python
@@ -135,7 +146,7 @@ def list_factory():
     return factory
 ```
 
-#### 1.2.1.4. パラメタライズド・フィクスチャ
+### 2.1.4. パラメタライズド・フィクスチャ
 複数の入力値による網羅的なテストを行いたい場合はパラメトライズ・フィクスチャというものがある。
 pytest.fixtureのデコレータのparams引数にlistなどのiterableを渡すと、各要素をパラメータとしたfixtureが自動で生成される。
 ```python
@@ -144,7 +155,7 @@ def student(request):
     return Student(request.param[0], request.param[1])
 ```
 
-### 1.2.2. パラメータ化したテスト
+## 2.2. パラメータ化したテスト
 １つのテストのある変数などをパラメータ化してテストを行うこともできる
 ```python
 @pytest.mark.parametrize(('number', 'expected'), [
@@ -156,14 +167,14 @@ def test_param(number, expected):
     assert is_prime(number) == expected
 ```
 parametrizeの第一引数で引数名を設定し、それぞれのパラメータを第二引数でlist(tuple)で設定する。
-### テストの検証
-####  条件： assert
+## 2.3. テストの検証
+###  2.3.1. 条件： assert
 検証したい条件を`assert`で比較する。`if a == b`で`True`だとテストが通り、`False`だと通らないみたいな感じ
 ```python
 def test1():
     assert 1 + 2 == 3
 ```
-#### エラー： pytest.raises
+### 2.3.2. エラー： pytest.raises
 `with pytest.raises(Exception)`でプログラム内でそのエラーが発生したかどうかを検証できる。`raises`の引数に起こってほしいエラーを記述する。
 また、以下のようにするとエラーメッセージのテストも可能
 ```python
@@ -176,7 +187,7 @@ def test_error_sum():
 
     assert str(e.value) == "unsupported operand type(s) for +: 'int' and 'str'"
 ```
-## 1.3. オプション
+# 3. オプション
 pytestのオプションは以下の通り
 |オプション名|意味|概要|
 |:--|:--|:--|
@@ -187,12 +198,74 @@ pytestのオプションは以下の通り
 |-s|標準出力|テスト実行中にprint文の出力を標準出力に書き出す|
 |-lf|失敗テスト|失敗しているテストのみ実行する|
 
-## 1.4. mock, patch
+# 4. 実行
+## 4.1. テスト指定
+以下のように対象テストを指定して実行できる
+* ファイル指定
+    `$ pytest test_1.py`
+* パス指定
+    フォルダ以下全実行
+    `$ pytest testing/`
+* キーワード指定
+    文字列に含まれるキーワードにマッチするテストを実行。対象はファイル名、クラス名、関数名
+    以下の例だと、"TestMyClass"のキーワードを含むテストを実行し、"method"を含むものは実行しない。"TestMyClass.test_something"は実行されるが、"TestMyClass.test_method_simple"は実行されない。
+    `$ pytest -k "MyClass and not method"`
+* ノードIDを指定
+    特定のクラス、メソッドを実行できる
+    `$ pytest test_mod.py::test_func`もしくは`pytest test_mod.py::TestClass::test_method`
+* デコレータ指定
+    以下は`@pytest.mark.slow`がついているテストを実行
+    `$ pytest -m slow`
+
+## 4.2. カバレッジ
+`pytest-cov`をインストールすることで、網羅率を取得できる
+`pip install pytest-cov`を実行する必要がある。
+
+`--cov`オプションを追加することで、以下のような網羅テスト率(C0カバレッジ)が取得できる。
+```text
+----------- coverage: platform win32, python 3.6.5-final-0 -----------
+Name              Stmts   Miss  Cover
+-------------------------------------
+py_test_main.py       5      0   100%
+testing_mod.py        4      0   100%
+-------------------------------------
+TOTAL                 9      0   100%
+```
+`--cov --cov-branch`オプションを追加し、以下のような条件分岐網羅テスト率(C1カバレッジ)を取得できる
+```text
+----------- coverage: platform win32, python 3.6.5-final-0 -----------
+Name              Stmts   Miss Branch BrPart  Cover
+---------------------------------------------------
+py_test_main.py       5      0      0      0   100%
+testing_mod.py        4      0      2      1    83%
+---------------------------------------------------
+TOTAL                 9      0      2      1    91%
+```
+それぞれの項目の意味は以下。
+|項目名|意味|
+|:--|:--|
+|Stmts|テスト時に通った処理の行数|
+|Miss|テスト時に通らなかった処理の行数|
+|Branch|条件分岐の数|
+|BrPart|通っていない条件の数|
+|Cover|網羅率|
+
+### 4.2.1. カバレッジの出力
+通常だとターミナルに表示される
+それに加え、xmlやhtmlでの表示ができる
+* xml
+    `--cov-report=xml`を追加。結果が`./coverage.xml`に出力される
+* html
+    `--cov-report=html`を追加。結果が`./htmlcov/`に出力される。
+
+
+# 5. mock, patch
 参考：[【pytest】モックの使い方まとめ](https://zenn.dev/re24_1986/articles/0a7895b1429bfa)
 pytest-mockというモジュールがある。
 pytest-mockはunittest.mockのラッパー。私はこっちのが書き方がすっきりしてて好き
 
-### 1.4.1. 基本
+
+## 5.1. 基本
 
 mocker.patchを使ってコード内の任意の関数をモックし、返り値を設定する。
 
@@ -213,7 +286,7 @@ def test_func_main(mocker):
 ```
 mockerはpytest-mockをインストールするとfixtureで使えるようになる（インポートする必要はなし）
 
-### 1.4.2. 名前空間の注意
+## 5.2. 名前空間の注意
 モジュールのインポートの仕方によって指定方法が変わる
 ```python
 # main.py
@@ -239,8 +312,8 @@ importのみでのインポートだとそのまま、from込みのインポー�
 参考：[Python の mock.patch のハマりやすい挙動についてまとめる - Qiita](https://qiita.com/Chanmoro/items/69f401ddbe41e818a8cf)
 
 
-### 1.4.3. 置き換え
-#### 1.4.3.1. メソッド・クラス
+## 5.3. 置き換え
+### 5.3.1. メソッド・クラス
 ```python
 # main.py
 def  func_main():
@@ -312,7 +385,7 @@ def test_func_main(mocker):
     ```
     side_effectでエラーを返すことができる。
 
-####  1.4.3.2. 辞書・環境変数
+###  5.3.2. 辞書・環境変数
 mocker.patch.dictを使うことで変数に代入された辞書を差し替えることができる
 ```python
 d = {"a": 10, "b": 20, "c": 30}
@@ -335,7 +408,7 @@ def test_func_main(mocker):
 mocker.patch.dict("os.environ", {"NEW_KEY":"newvalue"})
 ```
 
-#### 1.4.3.3. datetime
+### 5.3.3. datetime
 
 datetimeは他と同じようにpatchしようとするとエラーが出る
 1. freezegunを使う
@@ -380,7 +453,7 @@ datetimeは他と同じようにpatchしようとするとエラーが出る
         assert main.func() == datetime.datetime(2000, 1, 2, 3,4)
     ```
 
-#### 1.4.3.4. requestsライブラリ
+### 5.3.4. requestsライブラリ
 ```python
 # main.py
 def func(url):
@@ -417,7 +490,7 @@ def test_func(mocker):
     print(main.func("")) # 例外が発生
 ```
 
-### 1.4.4. mockの実行結果の検証
+## 5.4. mockの実行結果の検証
 モックが呼ばれたかどうかなど、モックに関する実行結果を確かめることができる。
 確認をしたいモックを以下のように定義し、テスト対象のメソッドをよびだしているとする。
 ```python
@@ -425,14 +498,14 @@ m = mocker.patch("main.func_sample", return_value=1)
 main.func_main()
 ```
 モックの実行結果の確認をするには、対応するメソッドを`m.method(param)`の形で呼び出す。
-#### 1.4.4.1. 実行回数
+### 5.4.1. 実行回数
 ```python
 assert m.call_count == 3 # m.call_count:呼ばれた回数
 m.assert_called() # 少なくとも１回呼ばれた
 m.assert_called_once() # 1回だけ呼ばれた
 m.assert_not_called() # 1回も呼ばれていない
 ```
-#### 1.4.4.2. 引数
+### 5.4.2. 引数
 ```python
 # 最後に実行したモックの引数
 # main(1, "test", [2,3,4])で呼び出したか確認する場合
@@ -469,3 +542,11 @@ args_list = m.call_args_list
 for args, kwargs in args_list:
     pass
 ```
+
+## 5.5. 使用されたかのみ確認: spy
+mocker.patchではそのメソッドの処理が置き換わってしまう。spyは処理はそのままに、呼び出されたかどうかの検証などができる
+```python
+# mocker.spy(<obj>,<name>)
+mock_spy = mocker.spy(main,"get_now")
+```
+引数や呼び出されたかどうかの検証はmocker.patchと同一
