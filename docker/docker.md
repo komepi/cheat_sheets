@@ -23,6 +23,34 @@ docker images -f "dangling=true"
 docker rmi $(docker images -f "dangling=true" -q)
 ```
 
+### volume
+#### リスト
+```
+docker volume ls
+```
+#### 削除
+```
+docker volume rm <id>
+```
+#### 全て削除
+```
+docker volume rm $(docker volume ls -qf dangling=true)
+```
+#### リンク切れ削除
+```
+docker volume ls -qf dangling=true | xargs -r docker volume rm
+```
+
+### network
+#### 一覧
+```
+docker network ls
+```
+#### 削除
+```
+docker network rm [<id,network_name> ...]
+```
+ただし何かのコンテナが使用していると削除できない。強制削除のオプションもなし
 ### ローカルからdockerコンテナにコピー
 ```
 docker cp {送信するファイル} {送信先}
@@ -34,7 +62,7 @@ docker cp {送信するファイル} {送信先}
 
 docker-composeで作成されたコンテナ、イメージ、ネットワーク、ボリューム、未定義コンテナすべてを一括削除する
 ```
-docker-compose down --rmi all --volumes --remove-orphans
+docker compose down --rmi all --volumes --remove-orphans
 ```
 * `down`
     `up`の逆で、`up`コマンドで作られるイメージ、コンテナ、ボリューム、ネットワークをすべて削除する。
