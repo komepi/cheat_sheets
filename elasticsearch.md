@@ -48,12 +48,16 @@ curl -XGET "localhost:9200/_cat/health?v"
 ```
 ## クラスタ内のノードリスト
 ```
-curl -XGET "localhost:9200/_cat/nodes?v
+curl -XGET "localhost:9200/_cat/nodes?v"
 ```
 ## インデックス
 ### 全インデックスのリスト
 ```
 curl -XGET "localhost:9200/_cat/indices?v"
+```
+エイリアスも取得したい場合は以下
+```
+curl http://localhost:9200/_aliases?pretty
 ```
 ### 作成
 ```
@@ -183,6 +187,7 @@ curl -XPOST "localhost:9200/[index name]/[type name]/_bulk?pretty" -----------
 ```
 curl -XGET "localhost:9200/[index name]/_search?[conditions]
 ```
+例)`curl -XGET "localhost:9200/test_index/_search?pretty"`
 結果、以下のようなデータを取得できる。
 ```cmd
 {
@@ -225,3 +230,166 @@ curl -XGET "localhost:9200/[index name]/_search?[conditions]
 * `hits.sort`: 結果のソートキー（スコアでソートする場合は欠落）
 
 検索条件の渡し方はurlに含ませる方法とJSON形式のリクエストボディを`_search`APIにPOSTする方法がある。
+
+### クエリ
+基本的は以下
+```
+{
+  "query":{"match_all":{}}
+  "from":10,
+  "size":2,
+  "sort":{<field_name>:{"order":<desc or asc>}}
+  "_source":[<field_name>, ...]
+  }
+}
+```
+`match_all`は指定したインデックスの全てを検索
+`from`は何番目からの結果を表示するかの設定。0から始まり、デフォルトは0
+`size`は何個の結果を表示するかの設定（デフォルトは10)
+`sort`は検索結果をソートする。フィールド名とdesc(降順)とasc(昇順)
+`_source`は検索結果の中で表示するフィールド名をリストで設定する
+
+`match`は`<field_name>`に`<value>`を含むものを全て返す
+```
+{
+  "query":{"match":{<field_name>:<value>}}
+}
+```
+
+`bool`は、複数のクエリを組み合わせることができる。`bool`内の要素がtrueである項目を返す
+この時、`must`,`should`,`must_not`を使用することができる
+それぞれ以下のように対応
+|es|db|
+|:--|:--|
+|must|AND|
+|should|OR|
+|must_not|NOR|
+以下のように使用
+以下は40歳であり、名前にたけしを含み、アドレスに"lane"か"mill"を含み、"state"が”ID"でない項目を返す
+```
+{
+  "query":{
+    "bool":{
+      "must":[
+        {"match": {"age":"40"}}
+        {"match": {"name":"takesi"}}
+      ],
+      "should":[
+        {"match": {"address": "lane"}},
+        {"match": {"address": "mill"}}
+      ],
+      "must_not":[
+        {"match": {"state":"ID"}}
+      ]
+    }
+  }
+}
+```
+
+* `query_string`
+参考: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html
+文字列を使用して検索する
+`query`のみが必須で、それ以外はオプション
+`query`に渡された文字列を解析して、検索する。イメージとしてはgoogle検索のときに使う文字列みたいな感じ
+`default_operator`は区切られたキーワード間の関係性を指定する。ANDとORの二種類で、デフォルトはOR。`capital of Hungry`がキーワードとして与えられた時、ORの場合は`capital OR of OR Hungry`に、ANDの場合は`capital AND of AND Hungry`になる
+`fields`は検索するフィールドをリストで指定する。
+
+```
+{
+  "query":{
+    "query_string":{
+      "query":<value>,
+      "default_operator":"and",
+      "fields":[<field_name>,...]
+    }
+  }
+}
+```
+
+* `range`
+参考: https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html
+値を範囲で検索する
+`field_name`は必須で、それ以外はオプション
+演算子は以下のように対応
+|記号|文字列|意味|
+|:--|:--|:--|
+|>|gt|より大きい|
+|>=|gte|以上|
+|<|lt|未満|
+|<=|lte|以下|
+`format`は`date`での比較の際に使用される日付のフォーマット
+```
+{
+  "query":{
+    "range":{<field_name>:{"gte":<value_gte>,"lte":<value_lte>}}
+  }
+}
+```
+## 確認形
+### 設定
+```cmd
+$ curl -XGET "http://localhost:9200/[index name]/_settings?pretty"
+```
+### マッピング
+```cmd
+$ curl -XGET "http://localhost:9200/[index name]/_mapping?pretty"
+```
+
+### アナライザ
+アナライザがどのように働くかのチェック
+```cmd
+$ curl -XPOST 'http://localhost:9200/[index_name]/_analyze?pretty' -H "Content-type: application/json" -d '{"text": [test_text],"analyzer":[used_analyzer]}'
+```
+例)"default"という名前のアナライザを使用して、"テスト"を検証
+```cmd
+$ curl -XPOST 'http://localhost:9200/test_index/_analyze?pretty' -H "Content-type: application/json" -d '{"text": "テスト","analyzer":"default"}'
+
+{
+  "tokens" : [
+    {
+      "token" : "テ",
+      "start_offset" : 0,
+      "end_offset" : 1,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "テス",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "テスト",
+      "start_offset" : 0,
+      "end_offset" : 3,
+      "type" : "word",
+      "position" : 2
+    },
+    {
+      "token" : "ス",
+      "start_offset" : 1,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 3
+    },
+    {
+      "token" : "スト",
+      "start_offset" : 1,
+      "end_offset" : 3,
+      "type" : "word",
+      "position" : 4
+    },
+    {
+      "token" : "ト",
+      "start_offset" : 2,
+      "end_offset" : 3,
+      "type" : "word",
+      "position" : 5
+    }
+  ]
+}
+```
+
+アナライザを指定しない場合、"standard"というデフォルトのアナライザが使用される
