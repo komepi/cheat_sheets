@@ -16,9 +16,16 @@
     - [1.3.5. 一覧](#135-一覧)
     - [1.3.6. 切り替え](#136-切り替え)
     - [1.3.7. 派生元の更新を取り込む](#137-派生元の更新を取り込む)
+  - [push](#push)
   - [1.4. fork](#14-fork)
     - [1.4.1. フォーク元の変更を反映する](#141-フォーク元の変更を反映する)
-  - [リモート先の変更を適応](#リモート先の変更を適応)
+  - [リモート](#リモート)
+    - [リモート先の登録](#リモート先の登録)
+    - [一覧](#一覧)
+    - [リモート先の削除](#リモート先の削除)
+    - [リモート先の変更を適応](#リモート先の変更を適応)
+  - [プルリクエスト](#プルリクエスト)
+    - [プルリクエストをローカルにチェックアウト](#プルリクエストをローカルにチェックアウト)
 
 
 ## 1.1. 設定
@@ -175,7 +182,29 @@ $ git checkout [ブランチ名]
   $ git merge upstream/[入れたいブランチ名]
   ```
 
-## リモート先の変更を適応
+## リモート
+### リモート先の登録
+```
+git remote add <remote_id> <remote_url>
+```
+例:`git remote add upstream https://github.com/user/hoge_remote.git`
+### 一覧
+```
+git remote -v
+```
+結果以下のように出力される
+```
+origin	https://github.com/user/hoge.git (fetch)
+origin	https://github.com/user/hoge.git (push)
+upstream	https://github.com/user/hoge_remote.git (fetch)
+upstream	https://github.com/user/hoge_remote.git (push)
+```
+
+### リモート先の削除
+```
+git remote rm <remotoe_id>
+```
+### リモート先の変更を適応
 ```cmd
 $ git fetch [remote]
 ```
