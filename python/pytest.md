@@ -14,6 +14,10 @@
     - [2.3.1. 条件： assert](#231-条件-assert)
     - [2.3.2. エラー： pytest.raises](#232-エラー-pytestraises)
 - [3. オプション](#3-オプション)
+- [テスト例](#テスト例)
+  - [デコレータを評価するテスト](#デコレータを評価するテスト)
+    - [引数なし](#引数なし)
+    - [引数あり](#引数あり)
 - [4. 実行](#4-実行)
   - [4.1. テスト指定](#41-テスト指定)
   - [4.2. カバレッジ](#42-カバレッジ)
@@ -167,6 +171,26 @@ def test_param(number, expected):
     assert is_prime(number) == expected
 ```
 parametrizeの第一引数で引数名を設定し、それぞれのパラメータを第二引数でlist(tuple)で設定する。
+
+indirectを使うと、そのパラメータを引数ではなくfixtureに対して渡すことができる
+```python
+@pytest.fixture
+def calc_instance(request):
+    config_dict = {"test1": {"a": 1, "b": 2}, "test2": {"a": 3, "b": 4}}
+    config = config_dict[request.param]
+    return Calculator(config["a"], config["b"])
+
+
+@pytest.mark.parametrize(
+    ("calc_instance", "expected"),
+    [("test1", 3), ("test2", 7)],
+    indirect=["calc_instance"],
+)
+def test_add(calc_instance, expected):
+    assert expected == calc_instance.add()
+```
+
+
 ## 2.3. テストの検証
 ###  2.3.1. 条件： assert
 検証したい条件を`assert`で比較する。`if a == b`で`True`だとテストが通り、`False`だと通らないみたいな感じ
@@ -187,6 +211,12 @@ def test_error_sum():
 
     assert str(e.value) == "unsupported operand type(s) for +: 'int' and 'str'"
 ```
+`args`など、Exceptionの属性にアクセスしたい場合、以下のようにする
+```python
+with pytest.raises(Exception) as e:
+    func()
+assert e.value.args=[]
+```
 # 3. オプション
 pytestのオプションは以下の通り
 |オプション名|意味|概要|
@@ -198,6 +228,49 @@ pytestのオプションは以下の通り
 |-s|標準出力|テスト実行中にprint文の出力を標準出力に書き出す|
 |-lf|失敗テスト|失敗しているテストのみ実行する|
 
+# テスト例
+## デコレータを評価するテスト
+### 引数なし
+```python
+def hoge(func):
+    @wraps(func)
+    def wrapper(n):
+        return func(n) + 1
+    return wrapper
+
+@hoge
+def sample(n):
+    return n*2
+
+if __name__ == "__main__":
+    assert sample(3) == 7
+```
+
+```python
+assert hoge(lambda n: 6)(ANY_VALUE) == 7
+```
+
+### 引数あり
+```python
+def hoge(m):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(n):
+            return func(n) + m
+        return wrapper
+    return decorator
+
+@hoge(2)
+def sample(n):
+    return n * 2
+
+if __name__ == '__main__':
+    assert sample(2) == 6
+```
+
+```python
+assert hoge(2)(lambda n: 4)(ANY_VALUE) == 6
+```
 # 4. 実行
 ## 4.1. テスト指定
 以下のように対象テストを指定して実行できる
@@ -489,7 +562,28 @@ def test_func(mocker):
     print(main.func('url2')) # goodbye World!
     print(main.func("")) # 例外が発生
 ```
+もしくは、responsesモジュールを使用する
+```python
+import responses
+class APITestCase(TestCase):
+    @responses.activate
+    def test_api(self):
+        import api
 
+        # setup
+        responses.add(
+            responses.GET,
+            'https://example.com/api/v3/users',
+            status=200,
+            body="[{'user': {'id': 1, 'username': 'test'}}]",
+            content_type="application/json",
+        )
+
+        # test
+        api.get_users()
+        assert responses.calls[0].request.method == 'GET'
+        assert responses.calls[0].request.url == 'https://example.com/api/v3/users'
+```
 ## 5.4. mockの実行結果の検証
 モックが呼ばれたかどうかなど、モックに関する実行結果を確かめることができる。
 確認をしたいモックを以下のように定義し、テスト対象のメソッドをよびだしているとする。
