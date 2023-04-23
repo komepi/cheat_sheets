@@ -31,6 +31,10 @@
     - [5.1.1. パッケージ内で別ディレクトリから](#511-パッケージ内で別ディレクトリから)
     - [5.1.2. 別ディレクトリからインポート](#512-別ディレクトリからインポート)
   - [5.2. カレントディレクトリ取得](#52-カレントディレクトリ取得)
+  - [ディレクトリ走査 os.work()](#ディレクトリ走査-oswork)
+    - [ファイル一覧の取得](#ファイル一覧の取得)
+      - [特定の拡張子のみを取得](#特定の拡張子のみを取得)
+      - [特定のファイルのみを取得](#特定のファイルのみを取得)
 - [6. pathlib](#6-pathlib)
   - [6.1. Pathオブジェクト生成・処理](#61-pathオブジェクト生成処理)
   - [6.2. パスの存在・種類](#62-パスの存在種類)
@@ -39,8 +43,8 @@
     - [6.3.2. 拡張子：suffix](#632-拡張子suffix)
     - [6.3.3. 親ディレクトリ](#633-親ディレクトリ)
     - [6.3.4. カレントディレクトリ：cwd](#634-カレントディレクトリcwd)
-    - [6.3.5. 同じディレクトリの別のファイル：with_name()](#635-同じディレクトリの別のファイルwith_name)
-    - [6.3.6. 拡張子を変更したパス：with_suffix](#636-拡張子を変更したパスwith_suffix)
+    - [6.3.5. 同じディレクトリの別のファイル：with\_name()](#635-同じディレクトリの別のファイルwith_name)
+    - [6.3.6. 拡張子を変更したパス：with\_suffix](#636-拡張子を変更したパスwith_suffix)
   - [6.4. 作成](#64-作成)
     - [6.4.1. ディレクトリ](#641-ディレクトリ)
   - [6.5. 削除](#65-削除)
@@ -65,9 +69,9 @@
 - [9. 文字列からメソッドを実行](#9-文字列からメソッドを実行)
   - [9.1. 関数を変数に代入：getattr](#91-関数を変数に代入getattr)
   - [9.2. 文字列から関数を呼び出す：locals, globals](#92-文字列から関数を呼び出すlocals-globals)
-- [10. 可変長引数:*args, **kwargs](#10-可変長引数args-kwargs)
-  - [10.1. *args](#101-args)
-  - [10.2. **kwargs](#102-kwargs)
+- [10. 可変長引数:\*args, \*\*kwargs](#10-可変長引数args-kwargs)
+  - [10.1. \*args](#101-args)
+  - [10.2. \*\*kwargs](#102-kwargs)
 - [11. ラムダ式: lambda](#11-ラムダ式-lambda)
   - [11.1. def との対応](#111-def-との対応)
   - [11.2. if文](#112-if文)
@@ -88,7 +92,7 @@
     - [13.2.1. 通常オブジェクト](#1321-通常オブジェクト)
     - [13.2.2. クラスのインスタンス](#1322-クラスのインスタンス)
     - [13.2.3. クラスや関数](#1323-クラスや関数)
-  - [13.3. pickleと_pickle](#133-pickleと_pickle)
+  - [13.3. pickleと\_pickle](#133-pickleと_pickle)
   - [13.4. deepcopyとの対応](#134-deepcopyとの対応)
 - [14. 名前でアクセスできるtuple: namedtuple](#14-名前でアクセスできるtuple-namedtuple)
 - [16. その他組み込み関数](#16-その他組み込み関数)
@@ -458,6 +462,115 @@ print(path)
 # /Users/mbp/Documents/my-project/python-snippets/notebook
 print(type(path))
 # <class 'str'>]
+```
+
+## ディレクトリ走査 os.work()
+`os.walk()`をfor文で回すことで、現在のディレクトリ、ない方するディレクトリ、内包するファイルを取得できる
+以下のようなディレクトリ構造を持つとする
+```
+test/
+  ├── dirA
+  │    ├── a-1.txt
+  │    ├── a-2.txt
+  │    └── dirD
+  │         └── d-1.txt
+  ├── dirB
+  │    ├── b-1.txt
+  │    └── b-2.txt
+  └── dirC
+       ├── c-1.txt
+       └── c-2.txt
+```
+
+```python
+import os
+for curDir, dirs, files in os.walk("test"):
+    print("================")
+    print("現在のディレクトリ: " + curDir)
+    print("内包するディレクトリ:" + dirs)
+    print("内包するファイル: " + files)
+```
+実行結果が以下
+```text
+===================
+現在のディレクトリ: test
+内包するディレクトリ: ['dirB', 'dirC', 'dirA']
+内包するファイル: []
+===================
+現在のディレクトリ: test/dirB
+内包するディレクトリ: []
+内包するファイル: ['b-2.py', 'b-1.py']
+===================
+現在のディレクトリ: test/dirC
+内包するディレクトリ: []
+内包するファイル: ['c-1.txt', 'c-2.txt']
+===================
+現在のディレクトリ: test/dirA
+内包するディレクトリ: ['dirD']
+内包するファイル: ['a-2.txt', 'a-1.txt']
+===================
+現在のディレクトリ: test/dirA/dirD
+内包するディレクトリ: []
+内包するファイル: ['d-1.txt']
+```
+引数で`topdown=False`とすることで、末端のディレクトリからボトムアップで走査できる。
+配下にディレクトリがある場合は、そちらを優先して走査できる
+
+```python
+import os
+for curDir, dirs, files in os.walk("test", topdown=False):
+    print("================")
+    print("現在のディレクトリ: " + curDir)
+    print("内包するディレクトリ:" + dirs)
+    print("内包するファイル: " + files)
+```
+```
+===================
+現在のディレクトリ: test/dirB
+内包するディレクトリ: []
+内包するファイル: ['b-2.py', 'b-1.py']
+===================
+現在のディレクトリ: test/dirC
+内包するディレクトリ: []
+内包するファイル: ['c-1.txt', 'c-2.txt']
+===================
+現在のディレクトリ: test/dirA/dirD
+内包するディレクトリ: []
+内包するファイル: ['d-1.txt']
+===================
+現在のディレクトリ: test/dirA
+内包するディレクトリ: ['dirD']
+内包するファイル: ['a-2.txt', 'a-1.txt']
+===================
+現在のディレクトリ: test
+内包するディレクトリ: ['dirB', 'dirC', 'dirA']
+内包するファイル: []
+```
+### ファイル一覧の取得
+```python
+import os
+ 
+for curDir, dirs, files in os.walk("test"):
+    for file in files:
+        print(os.path.join(curDir, file))
+```
+#### 特定の拡張子のみを取得
+```python
+import os
+ 
+for curDir, dirs, files in os.walk("test"):
+    for file in files:
+        if file.endswith(".txt"):
+            print(os.path.join(curDir, file))
+```
+#### 特定のファイルのみを取得
+```python
+import os
+ 
+for curDir, dirs, files in os.walk("test"):
+    for file in files:
+      if "d-1.txt" in file:
+        print(os.path.join(curDir, file))
 ```
 
 # 6. pathlib
