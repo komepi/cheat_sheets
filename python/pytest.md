@@ -14,6 +14,8 @@
     - [2.3.1. 条件： assert](#231-条件-assert)
     - [2.3.2. エラー： pytest.raises](#232-エラー-pytestraises)
 - [3. オプション](#3-オプション)
+- [便利機能](#便利機能)
+  - [ログの追跡: caplog](#ログの追跡-caplog)
 - [テスト例](#テスト例)
   - [デコレータを評価するテスト](#デコレータを評価するテスト)
     - [引数なし](#引数なし)
@@ -228,6 +230,83 @@ pytestのオプションは以下の通り
 |-s|標準出力|テスト実行中にprint文の出力を標準出力に書き出す|
 |-lf|失敗テスト|失敗しているテストのみ実行する|
 
+# 便利機能
+## ログの追跡: caplog
+pytestのfixtureに存在する、ログを追跡するもの
+公式ドキュメント: https://docs.pytest.org/en/latest/how-to/logging.html#caplog-fixture
+テストに引数としてcaplogを与えればいい
+```python
+def test_foo(caplog):
+    ....
+```
+
+`set_level`を使用してログレベルを変更できる。デフォルトだとルートロガー
+指定する際は第一引数にintでログレベルを指定する。もしくは`logging.INFO`のようにloggingから指定する
+ログレベルとintの対応は以下のようになっている
+|レベル|数値|
+|:--|:--|
+|CRITICAL|50|
+|ERROR|40|
+|WARNING|30|
+|INFO|20|
+|DEBUG|10|
+|NOTSET|0|
+
+この時引数にloggerを与えることで、任意のロガーに対してのログレベルを設定することもできる
+また`with`を使用することで、一部分にのみ適用することもできる。
+```python
+def test_foo(caplog):
+    caplog.set_level(logging.INFO)
+    caplog.set_level(50, logger="root.baz")
+    with caplog.set_level(logging.ERROR):
+        pass
+```
+
+値の取得には複数の方法が存在する
+テキストで取得するときは、`text`を使用する
+テキストでそれぞれ改行されて表示される。以下の例ではログレベルがデフォルトなのでinfoは表示されていない
+```python
+import logging
+
+def outlog():
+    logger = logging.getLogger("test")
+    logger.info("これはinfoログ")
+    logger.warning("これはwarningログ")
+    logger.error("これはerrorログ")
+
+class TestCapLog:
+    def test_caplog(self, caplog):
+        outlog()
+        print(caplog.text)
+
+# WARNING  test:test.py:6 これはwarningログ  
+# ERROR    test:test.py:7 これはerrorログ
+```
+
+アサートなどが簡単なのは`record_tuples`を使用した取得
+タプルで`(アプリ, ログレベル, メッセージ)`で取得できる
+```python
+def outlog():
+    logger = logging.getLogger("test")
+    logger.info("これはinfoログ")
+    logger.warning("これはwarningログ")
+    logger.error("これはerrorログ")
+
+class TestCapLog:
+    def test_caplog(self, caplog):
+        outlog()
+        print(caplog.record_tuples)
+
+# [('test', 20, 'これはinfoログ'), ('test', 30, 'これはwarningログ'), ('test', 40, 'これはerrorログ')]
+
+```
+またログは`logging.LogRecord`クラスで保存されている
+`caplog.records`で取得することで`logging.LogRecord`クラスのリストでも取得できる
+`logging.LogRecord`クラスのドキュメントは[ここ](https://docs.python.org/ja/3/library/logging.html#logrecord-objects)
+基本は`record_tuples`で十分だと思う
+
+`caplog`はフィクスチャなので、そのテスト内で複数ログを出力するメソッドを実行すればその全てが蓄積される
+`caplog.clear()`を使用すればキャプチャされたログをリセットできる
 # テスト例
 ## デコレータを評価するテスト
 ### 引数なし
