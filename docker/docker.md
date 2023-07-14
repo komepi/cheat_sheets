@@ -118,3 +118,17 @@ CONTAINER ID        NAME                     CPU %           MEM USAGE / LIMIT  
     通常はリアルタイムで更新するのをオフにする
 * 切り捨て表示しない： --no-trunc
     コンテナIDを切り捨てせずに全表示
+
+### docker demonの自動起動
+Dockerデーモンを起動するには以下のコマンド
+```cmd
+$ sudo systemctl start docker
+# 他のディストリビューションでは、次のように実行します
+$ sudo service docker start
+```
+ブート時に自動起動するには以下のコマンドを使用する
+```cmd
+$ sudo systemctl enable docker
+# 他のディストリビューションでは、次のように実行します
+$ sudo chkconfig docker on
+```
