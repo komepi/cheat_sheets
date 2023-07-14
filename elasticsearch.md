@@ -43,12 +43,22 @@ jvmのヒープサイズを変更するには`/{elasticsearchのインストー�
 `<REST Verb> /<Index>/<Type>/<ID>`
 `REST Verb`は`GET``PUT``DELETE`など
 ## クラスタのヘルスチェック
+* curl
 ```
 curl -XGET "localhost:9200/_cat/health?v"
 ```
+* kibana
+```
+GET /_cat/health?v
+```
 ## クラスタ内のノードリスト
+* curl
 ```
 curl -XGET "localhost:9200/_cat/nodes?v"
+```
+* kibana
+```
+GET /_cat/nodes?v
 ```
 ## インデックス
 ### 全インデックスのリスト
@@ -65,6 +75,13 @@ curl -XPUT "localhost:9200/[index name]?pretty
 
 # customerという名前のインデックスを作成する場合
 curl -XPUT "localhost:9200/customer?pretty
+```
+
+マッピングと一緒に作成する場合
+```
+curl -XPUT -H 'Content-Type: application' 'localhost:9200/[index name]?pretty' -d '
+{mapping}
+`
 ```
 ### 削除
 ```
@@ -232,6 +249,12 @@ curl -XGET "localhost:9200/[index name]/_search?[conditions]
 検索条件の渡し方はurlに含ませる方法とJSON形式のリクエストボディを`_search`APIにPOSTする方法がある。
 
 ### クエリ
+クエリを使用しての検索は以下のようになる
+```
+curl -XGET -H 'Content-Type: application/json' 'localhost:9200/[index name]/_search?pretty' -d '
+{query}
+'
+```
 基本的は以下
 ```
 {
