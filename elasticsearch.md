@@ -149,7 +149,7 @@ curl -XPUT "localhost:9200/[index name]/[type name]/[id]?pretty" -H "Content-Typ
 ```
 すでにその`id`のドキュメントが存在する場合、`data`の内容に置換される。既存する同じ`id`のドキュメントを置換する、という形なので、編集とはまた違う
 この時存在しない`id`を指定すると新たに作成される。
-
+PUTでは指定ドキュメントIDを持つドキュメントを丸ごと置き換える
 ### 更新
 ドキュメントを更新する
 ```
@@ -187,6 +187,7 @@ curl -XPOST "localhost:9200/[index name]/[type name]/[id]/_update?pretty" -H
 }
 ```
 ここで`ctx._source`は更新される現在のソースドキュメントを示す。
+POSTでは指定ドキュメントIDを持つドキュメントの一部フィールドを置き換える
 
 ### 削除
 ```

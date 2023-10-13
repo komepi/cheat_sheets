@@ -1,3 +1,21 @@
+- [postgresql](#postgresql)
+  - [テーブル作成](#テーブル作成)
+  - [テーブル一覧取得](#テーブル一覧取得)
+  - [カラム一覧取得](#カラム一覧取得)
+  - [レコード挿入](#レコード挿入)
+  - [レコード削除](#レコード削除)
+  - [最初の数件だけ表示](#最初の数件だけ表示)
+  - [ソートして表示](#ソートして表示)
+  - [jsonの使用](#jsonの使用)
+    - [値の取得](#値の取得)
+    - [キーの存在確認](#キーの存在確認)
+    - [JSON関数](#json関数)
+      - [json配列の長さを返す: json\_array\_length](#json配列の長さを返す-json_array_length)
+      - [key/valueの組み合わせの集合: json\_each](#keyvalueの組み合わせの集合-json_each)
+      - [キーの集合を返す: json\_object\_keys](#キーの集合を返す-json_object_keys)
+      - [値の集合を返す](#値の集合を返す)
+      - [JSON配列をレコード分割して返す: json\_array\_elements](#json配列をレコード分割して返す-json_array_elements)
+
 # postgresql
 
 ## テーブル作成
@@ -41,6 +59,26 @@ DELETE FROM table_name (WHERE 条件)
 ```
 WHEREの条件文に合致するレコードが消去される。WHERE文は省略可で、省略すると全て削除
 
+## レコードの更新
+```sql
+UPDATE table_name SET column=new_value (WHERE 条件)
+```
+## 最初の数件だけ表示
+```sql
+SELECT * FROM table_name LIMIT 1;
+```
+
+## ソートして表示
+column_nameをソートに使用するフィールド名とする
+* 昇順でソート
+  ```sql
+  SELECT * FROM table_name ORDER BY column_name;
+  ```
+* 降順でソート
+  ```sql
+  SELECT * FROM table_name ORDER BY column_name DESC;
+  ```
+
 ## jsonの使用
 データをjsonとして入力したり、jsonのカラムのデータのうち特定のキーに対応する値を使用することができる
 サンプルとして以下のようにテーブルとデータを作成
@@ -52,7 +90,7 @@ INSERT INTO sample_json (value) VALUES ('{"a":1,"b":{"c":[1,2,3]},"d":null,"e":t
 `-`・`#`・`>`・`>>`の組み合わせで指定
 |記号|意味|
 |:--|:--|
-|`-`|子要素を取得|
+|`-`|子|
 |`#`|パスを指定して取得|
 |`>`|JSONオブジェクトとして取得|
 |`>>`|テキストとして取得|
@@ -89,6 +127,29 @@ SELECT value FROM sample_json WHERE value?'c';
 ネスト先にある要素を使用するには`->`と組み合わせる
 ```sql
 SELECT value FROM sample_json WHERE value->'b'?'c';
+```
+### 指定したパスの値のみを変更
+これはjson型ではできず、jsonb型はできる
+使用するのはjsonb_set
+第一引数に変更対象、第二引数にパス、第三引数に変更後の値を渡す
+第四引数はオプションで、指定したパスが存在しない場合新たに作成するか否かを指定。Trueだと作成し、デフォルトはTrue
+```sql
+root=# insert into test_jsonb (json) values ('{"a":[{"c":1,"d":2},{"e":3,"f":4}],"b":1}'::jsonb);
+root=# update test_jsonb set json=jsonb_set(json,'{a,1,e}','"new value"') where id=1;
+root=# select * from test_jsonb;
+ id |                             json                              
+----+---------------------------------------------------------------
+  1 | {"a": [{"c": 1, "d": 2}, {"e": "new value", "f": 4}], "b": 1}
+root=# update test_jsonb set json=jsonb_set(json,'{a,1,g}','"new value"',False) where id=1;
+root=# select * from test_jsonb;
+ id |                             json                              
+----+---------------------------------------------------------------
+  1 | {"a": [{"c": 1, "d": 2}, {"e": "new value", "f": 4}], "b": 1}
+root=# update test_jsonb set json=jsonb_set(json,'{a,1,g}','"new value"') where id=1;
+root=# select * from test_jsonb;
+ id |                                      json                                       
+----+---------------------------------------------------------------------------------
+  1 | {"a": [{"c": 1, "d": 2}, {"e": "new value", "f": 4, "g": "new value"}], "b": 1}
 ```
 
 ### JSON関数
