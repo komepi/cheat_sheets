@@ -21,6 +21,7 @@
     - [設定](#設定)
     - [マッピング](#マッピング)
     - [アナライザ](#アナライザ)
+  - [スナップショット(バックアップ)](#スナップショットバックアップ)
 
 # gclog
 場所は`/{elasticsearchのインストール場所}/logs/gc.log
@@ -441,3 +442,55 @@ $ curl -XPOST 'http://localhost:9200/test_index/_analyze?pretty' -H "Content-typ
 ```
 
 アナライザを指定しない場合、"standard"というデフォルトのアナライザが使用される
+
+## スナップショット(バックアップ)
+1. snapshot用のディレクトリを作成
+   この時のディレクトリはどこでもいい
+   ```
+   mkdir /var/www/backup/elasticsearch
+   chown -R elasticsearch:elasticsearch /var/www/backup/elasticsearch
+   ```
+2. elasticsearch.ymlにpath.repoを登録する
+   {ELASTICSEARCH_HOME}/config/elasticsearch.ymlのpath.repoを以下のように変更
+   ```
+   path.repo: ["/var/www/backup/elasticsearch"]
+   ```
+3. elasticsearchにリポジトリを登録
+   リポジトリ名はなんでもいい。
+   ここでは例えば`test_repo`で進める
+   ```
+   curl -XPUT "localhost:9200/_snapshot/test_repo" -H "Content-type: application/json" -d '
+     {
+      "type": "fs",
+      "settings": {
+        "location": "/var/www/backup/elasticsearch/test_repo"
+      }
+     }'
+   ```
+* snapshot作成
+  スナップショット名はなんでもいい
+  ここでは例えば`snapshot_1`で進める
+   ```
+   curl -XPUT "localhost:9200/_snapshot/test_repo/snapshot_1"
+   ```
+
+   一応以下のようにするとsnapshotを取得するインデックスを指定できる
+   ```
+   curl -XPUT "localhost:9200/_snapshot/test_repo/snapshot_1" -H "Content-type: application/json" -d '{"indices":"test_index1,test_index2"}'
+   ```
+
+* snapshotのリストア
+  ```
+  curl -XPUT "localhost:9200/_snapshot/test_repo/snapshot_1/_restore?wait_for_completion=true" -H "Content-type: application/json" -d '
+  {
+    "indices": "*", "ignore_unavailable":true,"include_global_state":true
+  }'
+  ```
+* snapshotリポジトリのリストの表示
+  ```
+  curl -XGET "localhost:9200/_snapshot/"
+  ```
+* snapshotリポジトリに登録されているsnapshotのリストの表示
+  ```
+  curl -XGET "localhost:9200/_snapshot/test_repo/*"
+  ```

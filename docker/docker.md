@@ -1,5 +1,6 @@
 - [コンテナ一覧閲覧](#コンテナ一覧閲覧)
   - [コンテナリストの表示](#コンテナリストの表示)
+  - [コンテナの削除](#コンテナの削除)
   - [イメージリストの表示](#イメージリストの表示)
 - [images](#images)
   - [一覧](#一覧)
@@ -30,7 +31,37 @@ e80a2e378dd0        redis                      "docker-entrypoint.s…"   4 days
 c25d0803c172        handson/tutorial2:latest   "python index.py"        3+++++++++++++++++++++++++++++++++++12 days ago         Exited (255) 2 days ago   0.0.0.0:8080->8080/tcp              tutorial2_application_1
 ```
 `-a`オプションで停止しているコンテナも取得できる
+また`-f(--filter)`オプションはkey=value形式で絞り込みができる
+```cmd
+$ docker ps -a -f
+```
+filterは`docker ps -f "foo=baa" -f "fib=baz"`にたいにand検索もできる
+対応しているキーは以下（他にもある)
+|キー|意味|
+|:--|:--|
+|id|コンテナID|
+|name|コンテナ名(部分一致)|
+|label|コンテナに割り振られているlabel|
+|exited|コンテナの終了コード|
+|status|created, restarting, running, removeing, paused, exited, deadのどれか|
+|ansestor|指定したイメージを原型として共有するフィルタ。<image-name>[:<tag>],<image id>, <image@digest>で表す。tagは省略した場合はlatest|
+|before, since|指定したコンテナID, コンテナ名で、コンテナが作成前か作成後かでフィルタ|
+その他の具体的な詳細は以下
+https://docs.docker.jp/engine/reference/commandline/ps.html#id21
 
+#### コンテナの削除
+```cmd
+$ docker rm [{container id}...]
+```
+また複数指定もできる
+例
+```cmd
+$ docker rm a403ffe73d31å
+
+$ docker rm a403ffe73d31 5200866fb18d
+
+```
+また`-f`オプションで強制的に削除
 #### イメージリストの表示
 ```cmd
 docker images
@@ -80,11 +111,18 @@ docker volume ls -qf dangling=true | xargs -r docker volume rm
 ```
 docker network ls
 ```
+`-q`オプションでIDのみの出力となる
+
 #### 削除
 ```
 docker network rm [<id,network_name> ...]
 ```
 ただし何かのコンテナが使用していると削除できない。強制削除のオプションもなし
+全てのネットワークを削除する際は以下
+```
+docker network rm $(docker network ls -q)
+```
+
 ### ローカルからdockerコンテナにコピー
 ```
 docker cp {送信するファイル} {送信先}

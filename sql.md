@@ -4,11 +4,13 @@
   - [カラム一覧取得](#カラム一覧取得)
   - [レコード挿入](#レコード挿入)
   - [レコード削除](#レコード削除)
+  - [レコードの更新](#レコードの更新)
   - [最初の数件だけ表示](#最初の数件だけ表示)
   - [ソートして表示](#ソートして表示)
   - [jsonの使用](#jsonの使用)
     - [値の取得](#値の取得)
     - [キーの存在確認](#キーの存在確認)
+    - [指定したパスの値のみを変更](#指定したパスの値のみを変更)
     - [JSON関数](#json関数)
       - [json配列の長さを返す: json\_array\_length](#json配列の長さを返す-json_array_length)
       - [key/valueの組み合わせの集合: json\_each](#keyvalueの組み合わせの集合-json_each)
@@ -225,3 +227,8 @@ root=# SELECT jsonb_array_elements(value->'b'->'c') FROM sample_json;
 (3 rows)
 ```
 この時array以外を渡すとエラー
+
+
+
+
+compiled_query = query_action_activities.we

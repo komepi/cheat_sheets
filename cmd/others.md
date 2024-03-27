@@ -25,6 +25,81 @@
   - [7.4. プロセス一覧](#74-プロセス一覧)
   - [7.5. ファイルに出力](#75-ファイルに出力)
 - [8. 公開鍵・秘密鍵の作成：ssh-keygen](#8-公開鍵秘密鍵の作成ssh-keygen)
+- [JSON加工コマンド: jq](#json加工コマンド-jq)
+  - [基本](#基本)
+  - [コマンドライン](#コマンドライン)
+  - [オプション](#オプション)
+    - [出力関連](#出力関連)
+      - [インデント数(--indent n)](#インデント数--indent-n)
+      - [タブインデント(--tab)](#タブインデント--tab)
+      - [コンパクト出力(-c | --compact-output)](#コンパクト出力-c----compact-output)
+      - [キーソート出力(-S | --sort-keys)](#キーソート出力-s----sort-keys)
+      - [RAW出力(-r | --raw-output)](#raw出力-r----raw-output)
+      - [連続出力(-j | --join-output)](#連続出力-j----join-output)
+      - [ASCII出力(-a | --ascii-output)](#ascii出力-a----ascii-output)
+    - [入力関連](#入力関連)
+      - [綴り入力(-s | --slurp)](#綴り入力-s----slurp)
+      - [RAW入力(-R | --raw-input)](#raw入力-r----raw-input)
+      - [入力なし(-n | --null-input)](#入力なし-n----null-input)
+    - [キーアサイン](#キーアサイン)
+      - [引数指定(--arg key value)](#引数指定--arg-key-value)
+      - [引数指定(JSON) (--argjson key json)](#引数指定json---argjson-key-json)
+      - [ファイル指定(--slurpfile key filename)](#ファイル指定--slurpfile-key-filename)
+      - [ファイル指定(--argfile key filename)](#ファイル指定--argfile-key-filename)
+      - [ファイル指定(--rawfile key filename)](#ファイル指定--rawfile-key-filename)
+    - [引数指定(--args)](#引数指定--args)
+      - [JSON指定](#json指定)
+    - [その他](#その他)
+      - [ストリーム処理(--stream)](#ストリーム処理--stream)
+  - [フィルタ](#フィルタ)
+    - [キーによる抽出](#キーによる抽出)
+      - [キー(.key)](#キーkey)
+      - [列挙(,)](#列挙)
+    - [配列の抽出](#配列の抽出)
+      - [配列(\[\])](#配列)
+      - [配列のインデックス指定(\[n\], \[-n\], \[n:m\])](#配列のインデックス指定n--n-nm)
+      - [パイプラインによる連結](#パイプラインによる連結)
+      - [ドットによる連結](#ドットによる連結)
+    - [抽出結果の整形](#抽出結果の整形)
+      - [配列への整形(\[filter\])](#配列への整形filter)
+      - [オブジェクトへの整形({filter})](#オブジェクトへの整形filter)
+    - [再度抽出](#再度抽出)
+  - [ビルトイン](#ビルトイン)
+    - [セレクト](#セレクト)
+    - [合計](#合計)
+    - [配列処理](#配列処理)
+      - [ソート(sort, sort\_by(path\_expression))](#ソートsort-sort_bypath_expression)
+      - [グルーピング(group\_by(path\_expression))](#グルーピングgroup_bypath_expression)
+      - [unique, unique\_by(path\_exp)](#unique-unique_bypath_exp)
+      - [reverse](#reverse)
+      - [flatten, flatten(depth)](#flatten-flattendepth)
+      - [bsearch(x)](#bsearchx)
+    - [長さ(length)](#長さlength)
+    - [パス配列](#パス配列)
+      - [path(path\_expression)](#pathpath_expression)
+      - [getpath(path)](#getpathpath)
+      - [setpath(path;value)](#setpathpathvalue)
+      - [delpaths(paths)](#delpathspaths)
+      - [paths, paths(node\_fileter)](#paths-pathsnode_fileter)
+    - [キー・バリュー](#キーバリュー)
+      - [keys, keys\_unsorted](#keys-keys_unsorted)
+      - [キーの存在確認(has(key))](#キーの存在確認haskey)
+      - [in(value)](#invalue)
+    - [文字列処理](#文字列処理)
+      - [startswith(str), ensswith(str)](#startswithstr-ensswithstr)
+      - [ltrimstr(str), rtrimstr(str)](#ltrimstrstr-rtrimstrstr)
+    - [文字列・配列](#文字列配列)
+      - [split(str),split(reg:flags)](#splitstrsplitregflags)
+      - [join(str)](#joinstr)
+      - [contains(element)](#containselement)
+    - [削除](#削除)
+      - [del(path\_expression)](#delpath_expression)
+    - [JSON](#json)
+      - [tojson](#tojson)
+      - [fromjson](#fromjson)
+  - [文字列](#文字列)
+    - [文字列の内挿((filter))](#文字列の内挿filter)
+    - [型](#型)
 # 1. scpコマンド
 以下のコマンドを使用することで、ローカルから他サーバーに、もしくは逆パターンでファイルなどを転送できる。
 ```
@@ -438,3 +513,605 @@ Your public key has been saved in id_rsa.pub.
 設定で何も入力せずにEnterを押下するとデフォルトで作成される。
 結果、`id_rsa`と`id_rsa.pub`が作成される。
 それぞれ、`id_rsa`が**秘密鍵**、`id_rsa.pub`が**公開鍵**となる。
+
+# JSON加工コマンド: jq
+参考にしたサイトは[ここ](https://www.tohoho-web.com/ex/jq.html)
+jqコマンドがインストールされていないことがある
+以下のようにしてインストール
+* centos
+    ```cmd
+    # yum -y install epel-release
+    # yum -y install jq
+    ```
+* macos
+    ```cmd
+    # brew install jq
+    ```
+* windows
+    https://zenn.dev/easy_easy/articles/e47b37b04dd1153d5b29
+    ここを参考に
+
+## 基本
+JSONのプロセッサーツール
+文字列のJSONを整形して出力できる
+```cmd
+$ echo '{"a":123,"b":456}' | jq
+{
+  "a": 123,
+  "b": 456
+}
+```
+JSONの中から指定したキーの情報を取得もできる
+```cmd
+$ echo '{"a":123, "b":456}' | jq '.b'
+456
+```
+他にもageが40以下など条件を指定して取得したり、整形や合計値を求めることもできる
+
+## コマンドライン
+```
+jq [options]
+jq [options] filter [file...]
+jq [options] --args filter [arguments...]
+jq [options] --jsonargs filter [json_texts...]
+```
+以下のようにパイプラインで繋いだり、ファイルから取得したりする
+```cmd
+$ cat sample.json | jq
+$ cat sample.json | jq '.users'
+$ jq '.users' sample.json
+```
+## オプション
+### 出力関連
+#### インデント数(--indent n)
+インデント数を指定
+```
+$ echo '{"name": "Yamada"}' | jq --indent 4
+{
+    "name": "Yamada"
+}
+```
+#### タブインデント(--tab)
+インデントにタブを使用
+```
+$ echo '{"name": "Yamada"}' | jq --tab
+{
+	"name": "Yamada"
+}
+```
+#### コンパクト出力(-c | --compact-output)
+改行やインデントなしで出力する
+```
+$ echo '{"name": "Yamada"}' | jq -c
+{"name": "Yamada"}
+```
+
+#### キーソート出力(-S | --sort-keys)
+キーをソートして出力
+```
+$ echo '{"b":"B", "c":"C", "a":"A"}' | jq -S
+{
+  "a": "A",
+  "b": "B",
+  "c": "C"
+}
+```
+
+#### RAW出力(-r | --raw-output)
+出力データの文字列からダブルクオーテーションを取り除く
+```
+$ echo '{"name":"Yamada"}' | jq '.name'
+"Yamada"
+$ echo '{"name":"Yamada"}' | jq -r '.name'
+Yamada
+```
+
+#### 連続出力(-j | --join-output)
+出力データの文字列からダブルクオーテーションと改行を取り除く
+```
+$ echo '{"name":"Yamada"}{"name":"Tanaka"}' | jq -j '.name'
+YamadaTanaka
+```
+
+#### ASCII出力(-a | --ascii-output)
+非ASCII文字をASCII文字で出力
+```
+$ echo '{"name":"山田"}' | jq -c
+{"name":"山田"}
+$ echo '{"name":"山田"}' | jq -c -a
+{"name":"\u5c71\u7530"}
+```
+
+### 入力関連
+#### 綴り入力(-s | --slurp)
+複数のJSONが連続するデータを読み取り、配列に変換して出力
+```
+$ echo '{"name":"Yamada"}{"name":"Suzuki"}' | jq -c
+{"name":"Yamada"}
+{"name":"Suzuki"}
+$ echo '{"name":"Yamada"}{"name":"Suzuki"}' | jq -c -s
+[{"name":"Yamada"},{"name":"Suzuki"}]
+```
+
+#### RAW入力(-R | --raw-input)
+入力をJSONとしてでなく、改行で区切られた文字列の集合として扱う
+```
+$ cat xx.csv
+Yamada,26
+Tanaka,32
+$ cat xx.csv | jq -c -R 'split(",")'
+["Yamada","26"]
+["Tanaka","32"]
+```
+
+#### 入力なし(-n | --null-input)
+入力を読み込まず、引数で渡した文字列をJSONとして扱う
+```
+$ jq -n '{"name":"Yamada"}'
+{
+  "name": "Yamada"
+}
+```
+
+### キーアサイン
+#### 引数指定(--arg key value)
+$keyにvalueを割り当てる
+```
+$ jq -nc --arg name Yamada '{"name": $name}'
+{"name": "Yamada"}
+```
+
+#### 引数指定(JSON) (--argjson key json)
+$keyにJSON値valueを割り当てる
+```
+$ jq -cn --argjson foo '{"name":"Yamada"}' '{"foo":$foo}'
+{"foo":{"name":"Yamada"}}
+```
+
+#### ファイル指定(--slurpfile key filename)
+$keyにfilenameで指定したファイルの中身を割り当てる
+```
+$ echo '{"name":"Yamada"}{"name":"Tanaka"}' > sample.json
+$ jq -nc --slurpfile foo sample.json '{"foo":$foo}'
+{"foo":[{"name":"Yamada"},{"name":"Tanaka"}]}
+```
+
+#### ファイル指定(--argfile key filename)
+--slurpfileと同じ。違いとしては、こちらはファイルの内容が１行の場合のみ使用できる
+```
+$ echo -n '"Yamada"' > sample.raw
+$ jq -nc --argfile foo sample.raw '{"foo":$foo}'
+{"foo":"Yamada"}
+```
+
+#### ファイル指定(--rawfile key filename)
+$keyにfilenameで指定したファイルの中身(RAWデータ)を割り当てる
+```
+$ echo -n Yamada > sample.raw
+$ jq -nc --rawfile foo sample.raw '{"foo":$foo}'
+{"foo":"Yamada"}
+```
+
+### 引数指定(--args)
+パラメータを引数で指定。パラメータは`$ARG.positional`で参照できる
+```
+$ jq -nc --args '$ARGS' AAA BBB
+{"positional":["AAA","BBB"],"named":{}}
+```
+
+#### JSON指定
+パラメータをJSON形式で指定
+パラメータは`$ARG.positional`で参照できる
+```
+$ jq -nc --jsonargs '$ARGS' '{"arg1":"AAA","arg2":"BBB"}'
+{"positional":[{"arg1":"AAA","arg2":"BBB"}],"named":{}}
+```
+
+### その他
+#### ストリーム処理(--stream)
+入力をストリーム的に読み込み、一つの値を[[値のパス配列],値]の列に変換しながら処理
+JSONが完了していなくても値毎に逐次処理できるため、巨大なJSONファイルを逐次処理する際に利用されます。
+例えばsample.jsonが以下だとする
+```json
+{
+  "status": "OK",
+  "count": 3,
+  "users": [
+    { "name": "Yamada", "age": 26 },
+    { "name": "Tanaka", "age": 32 },
+    { "name": "Suzuki", "age": 45 }
+  ]
+}
+```
+コマンドを使用すると以下
+```cmd
+$ cat sample.json | jq -c --stream
+[["status"],"OK"]
+[["count"],3]
+[["users",0,"name"],"Yamada"]
+[["users",0,"age"],26]
+[["users",0,"age"]]
+[["users",1,"name"],"Tanaka"]
+[["users",1,"age"],32]
+[["users",1,"age"]]
+[["users",2,"name"],"Suzuki"]
+[["users",2,"age"],45]
+[["users",2,"age"]]
+[["users",2]]
+[["users"]]
+```
+
+## フィルタ
+JSONからキーを指定して値を取り出す
+以下におけるsample.jsonは以下の値とする
+```json
+{
+  "status": "OK",
+  "count": 3,
+  "users": [
+    { "name": "Yamada", "age": 26 },
+    { "name": "Tanaka", "age": 32 },
+    { "name": "Suzuki", "age": 45 }
+  ]
+}
+```
+### キーによる抽出
+#### キー(.key)
+`.key`は該当するキーの値を取り出す
+```
+$ cat sample.json | jq '.status'
+"OK"
+```
+#### 列挙(,)
+カンマで複数の値を取り出せる
+```
+$ cat sample.json | jq '.status, .count'
+"OK"
+3
+```
+
+### 配列の抽出
+#### 配列([])
+配列を抽出する
+```
+$ cat sample.json | jq -c '.users'
+[{"name":"Yamada","age":26},{"name":"Tanaka","age":32},{"name":"Suzuki","age":45}]
+$ cat sample.json | jq -c '.users[]'
+{"name":"Yamada","age":26}
+{"name":"Tanaka","age":32}
+{"name":"Suzuki","age":45}
+```
+
+#### 配列のインデックス指定([n], [-n], [n:m])
+0から数えてn番目の要素を取り出す
+```
+$ cat sample.json | jq -c '.users[1]'
+{"name":"Tanaka","age":32}
+```
+`[-n]`とすると、最後からn番目の要素を取り出す
+```
+$ cat sample.json | jq -c '.users[-1]'
+{"name":"Suzuki","age":45}
+```
+`[n:m]`とすると、n〜m番目の要素を配列形式で取り出す
+```
+$ cat sample.json | jq -c '.users[0:2]'
+[{"name":"Yamada","age":26},{"name":"Tanaka","age":32}]
+```
+
+###　抽出結果から再抽出
+パイプラインで複数のjqコマンドを連結する方法と、ドットで連結する方法がある
+#### パイプラインによる連結
+複数のjqコマンドを連結することができる
+パイプで連結し一つ目のフィルタで抽出した結果を入力として再度抽出することもできる
+```
+$ cat sample.json | jq '.users[]' | jq '.name'
+"Yamada"
+"Tanaka"
+"Suzuki"
+$ cat sample.json | jq '.users[] | .name'
+"Yamada"
+"Tanaka"
+"Suzuki"
+```
+
+#### ドットによる連結
+```
+$ cat sample.json | jq '.users[].name'
+"Yamada"
+"Tanaka"
+"Suzuki"
+```
+
+### 抽出結果の整形
+#### 配列への整形([filter])
+抽出した結果を配列として整形するには全体を`[...]`で囲む
+```$ cat sample.json | jq -c '[.users[].name]'
+["Yamada","Tanaka","Suzuki"]
+```
+以下のように名前をキーとして配列にもできる
+```
+$ cat sample.json | jq -c '.users[] | [.name, .age]'
+["Yamada",26]
+["Tanaka",32]
+["Suzuki",45]
+```
+
+#### オブジェクトへの整形({filter})
+オブジェクトとして整形したいときは全体を`{key: ....}`で囲む
+```
+$ cat sample.json | jq -c '{name:.users[].name}'
+{"name":"Yamada"}
+{"name":"Tanaka"}
+{"name":"Suzuki"}
+```
+オブジェクト配列にもできる
+```
+$ cat sample.json | jq -c '.users[] | {N:.name, A:.age}'
+{"N":"Yamada","A":26}
+{"N":"Tanaka","A":32}
+{"N":"Suzuki","A":45}
+```
+
+キーを固定値でなく、値をキーと指定場合、以下のようにキー名を`(...)`で囲む
+```
+cat sample.json | jq -c '.users[] | {(.name):.age}'
+{"Yamada":26}
+{"Tanaka":32}
+{"Suzuki":45}
+```
+
+### 再度抽出
+`.filter1.filter2.filter3.filterx`を途中のフィルターを省略して`..|.filterx`と表現できる
+例えばsample.jsonのデータ階層にかかわらずnameの値を抽出するには`..|.name`とする
+.nameにマッチしない値もあるためエラー無視の`?`を付加して`..|.name?`とし、さらに`|strings`で文字列のみを抽出
+```
+$ cat sample.json | jq '..|.name?|strings'
+"Yamada"
+"Tanaka"
+"Suzuki"
+```
+
+## ビルトイン
+### セレクト
+配列やJSON列を受け取り、条件にマッチした列のみを抽出
+```
+$ echo '[1,2,3,4,5]' | jq -c 'select(. > 2)'
+[1,2,3,4,5]
+$ echo '[{"k":"ABC","v":92},{"k":"DEF","v":76}]' | jq -c '.[] | select(.v > 80)'
+{"k":"ABC","v":92}
+```
+
+### 合計
+配列の値の合計を求める
+```
+$ echo '[1,2,3]' | jq -c 'add'
+6
+```
+
+### 配列処理
+#### ソート(sort, sort_by(path_expression))
+配列をソートする
+path_expressionを指定した場合はその指定したキーでソート
+```
+$ echo '[3,5,1,4,2]' | jq -c 'sort'
+[1,2,3,4,5]
+$ echo '[{"A":3,"B":2},{"A":1,"B":3},{"A":2,"B":1}]' | jq -c 'sort_by(.B)'
+[{"A":2,"B":1},{"A":3,"B":2},{"A":1,"B":3}]
+```
+
+#### グルーピング(group_by(path_expression))
+path_expression で指定したキーが同じ値を持つものをグルーピング
+```
+$ echo '[{"A":1,"B":3},{"A":3,"B":2},{"A":1,"B":1}]' | jq -c 'group_by(.A)'
+[[{"A":1,"B":3},{"A":1,"B":1}],[{"A":3,"B":2}]]
+```
+
+#### unique, unique_by(path_exp)
+重複した値を一つにまとめる
+```
+$ echo '[1,2,3,2,1]' | jq -c 'unique'
+[1,2,3]
+$ echo '[{"A":3,"B":1},{"A":1,"B":3},{"A":2,"B":1}]' | jq -c 'unique_by(.B)'
+[{"A":3,"B":1},{"A":1,"B":3}]
+```
+
+#### reverse
+配列の順を逆にする
+```
+$ echo '[1,2,3]' | jq -c 'reverse'
+[3,2,1]
+```
+
+#### flatten, flatten(depth)
+配列の階層をフラットにする
+depthを指定すると、depth階層までの配列をフラットにする
+```
+$ echo '[1,[2,[3,4]]]' | jq -c 'flatten'
+[1,2,3,4]
+$ echo '[1,[2,[3,4]]]' | jq -c 'flatten(1)'
+[1,2,[3,4]]
+```
+
+#### bsearch(x)
+ソート済みの配列を入力として値xをバイナリサーチする
+見つかればそのインデックス、見つからなければ見つからないと判断した一のインデックスの負数から１引いた値を返す
+```
+$ echo '[1,3,5,7,9]' | jq 'bsearch(5)'
+2
+$ echo '[1,3,5,7,9]' | jq 'bsearch(6)'
+-4
+```
+
+### 長さ(length)
+配列の個数、オブジェクトの要素数、文字列の文字数を返す
+```
+$ echo '["a","b","c"]' | jq 'length'
+3
+```
+
+### パス配列
+#### path(path_expression)
+パスとして参照されるキー名、配列インデックスの配列を返す
+```
+$ echo 'null' | jq -c 'path(.a[0].b)'
+["a",0,"b"]
+```
+
+#### getpath(path)
+パス配列を指定して値を抽出
+```
+$ echo '{"a":{"b":{"c":123}}}' | jq -c 'getpath(["a", "b", "c"])'
+123
+```
+
+#### setpath(path;value)
+パス配列を指定して値を変更
+```
+$ echo '{"a":{"b":{"c":123}}}' | jq -c 'setpath(["a", "b", "c"]; 456)'
+{"a":{"b":{"c":456}}}
+```
+
+#### delpaths(paths)
+パス配列を指定して値を削除
+```
+$ echo '{"a":{"b":{"c":123}}}' | jq -c 'delpaths([["a", "b", "c"]])'
+{"a":{"b":{}}}
+```
+
+#### paths, paths(node_fileter)
+それぞれの値を得るためのパス配列の一覧を返す
+node_filterに型名を指定すると型にマッチする要素に関してのみ返す
+型については[ここ](#型)を参考にする
+```
+$ echo '{"a":123, "b":456, "c":{"d":789}}' | jq -c '[paths]'
+[["a"],["b"],["c"],["c","d"]]
+$ echo '{"a":123, "b":456, "c":{"d":789}}' | jq -c '[paths(scalars)]'
+[["a"],["b"],["c","d"]]
+```
+
+### キー・バリュー
+#### keys, keys_unsorted
+キーのみの配列をソートして返す
+```
+$ echo '{"b":"B", "c":"C", "a":"A"}' | jq -c 'keys'
+["a","b","c"]
+```
+ソートしない場合はkeys_unsorted
+```
+$ echo '{"b":"B", "c":"C", "a":"A"}' | jq -c 'keys_unsorted'
+["b","c","a"]
+```
+
+#### キーの存在確認(has(key))
+オブジェクトを受け取り、keyキーを持っていればtrue、そうでなければfalse
+```
+$ echo '{"foo":"FOO"}' | jq 'has("foo"), has("baa")'
+true
+false
+```
+
+#### in(value)
+値の配列を受け取り、引数で指定したオブジェクトのキーとして存在すれば true、さもなくば false を返します。
+```
+$ echo '["foo","bar","baz"]' | jq '.[] | in({"foo":null})'
+true
+false
+false
+```
+
+### 文字列処理
+#### startswith(str), ensswith(str)
+startswithは文字列がstrで始まっていればtrueを返す
+ensswithは文字列がstrで終わっていればtrueを返す
+```
+$ echo '"Japanese"' | jq 'startswith("Jap")'
+true
+$ echo '"Japanese"' | jq 'endswith("ese")'
+true
+```
+
+#### ltrimstr(str), rtrimstr(str)
+先頭から（末尾から）strを取り除く
+```
+$ echo '"Japanese"' | jq 'ltrimstr("Jap")'
+"anese"
+$ echo '"Japanese"' | jq 'rtrimstr("ese")'
+"Japan"
+```
+
+### 文字列・配列
+#### split(str),split(reg:flags)
+文字列をデリミタで分割
+正規表現や正規表現のフラグも使える
+```
+$ echo '"foo,baa,baz"' | jq -c 'split(",")'
+["foo","baa","baz"]
+```
+#### join(str)
+配列をデリミタで連結
+```
+$ echo '["foo","baa","baz"]' | jq 'join(",")'
+"foo,baa,baz"
+```
+
+#### contains(element)
+入力が文字列→指定した文字列が含まれていればtrue
+入力が配列→指定した配列要素が全て含まれていればtrue
+入力がオブジェクト→指定したパスの値が合致していればtrue
+```
+$ echo '"ABCDEFGHIJ"' | jq 'contains("DEF")'
+true
+$ echo '["A","B","C"]' | jq 'contains(["A","C"])'
+true
+$ echo '{"A":12, "B":13, "D":{"E":14}}' | jq 'contains({"A":12, "D":{"E":14}})'
+true
+```
+
+
+### 削除
+#### del(path_expression)
+オブジェクトを受け取り指定したキーを削除
+配列を受け取り指定したインデックスの要素を削除
+```
+$ echo '{"foo":"FOO", "baa":"BAA", "baz":"BAZ"}' | jq -c 'del(.foo, .baz)'
+{"baa":"BAA"}
+$ echo '["foo", "baa", "baz"]' | jq -c 'del(.[0, 2])'
+["baa"]
+```
+
+### JSON
+#### tojson
+データをJSON文字列に変換
+```
+$ echo '{"name":"Tanaka"}' | jq 'tojson'
+"{\"name\":\"Tanaka\"}"
+```
+#### fromjson
+JSON文字列をデータに変換
+```
+echo '"{\"name\":\"Tanaka\"}"' | jq -c 'fromjson'
+{"name": "Tanaka"}
+```
+## 文字列
+### 文字列の内挿(\(filter))
+\(filter)を記述することで抽出した値を文字列の中に埋め込める
+```
+$ echo '{"name":"Tanaka"}' | jq '"My name is \(.name)."'
+"My name is Tanaka."
+```
+
+### 型
+jqにおける方は以下のようになっている
+?のやつはよくわかってないやつ
+|型名|例|
+|:--|:--|
+|arrays|[]|
+|objects|{}|
+|iterables|?|
+|booleans|true|
+|numbers|123|
+|finites|?|
+|strings|"test"|
+|nulls|null|
+|scalars|"test",123(arrays,objects以外)|
